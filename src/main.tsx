@@ -4,7 +4,9 @@ import './index.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
-	<App />,
+	<div className="flex h-screen w-screen flex-col items-center justify-center">
+		<App />
+	</div>,
 	// <StrictMode>
 	// </StrictMode>,
 )
