@@ -1,0 +1,33 @@
+[
+	{
+		"name": "start",
+		"label": "Start",
+		"type": "button"
+	},
+	{
+		"name": "pause",
+		"label": "Pause",
+		"type": "button"
+	},
+	{
+		"name": "reset",
+		"label": "Reset",
+		"type": "button"
+	},
+	{
+		"name": "set_minute",
+		"label": "Set Minute",
+		"tyoe": "number",
+		"min": 0,
+		"max": 99999,
+		"step": 1
+	},
+	{
+		"name": "set_second",
+		"label": "Set Second",
+		"tyoe": "number",
+		"min": 0,
+		"max": 99999,
+		"step": 1
+	}
+]
