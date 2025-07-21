@@ -13,9 +13,13 @@ export const useDisplayConnection = (): UseDisplayConnectionResult => {
 	const [showQRcode, setShowQRcode] = useState(true)
 
 	useEffect(() => {
+		const urlParams = new URLSearchParams(window.location.search)
+		const initialId = urlParams.get('id')
+
 		const displayInstance = new Display({
 			serverUrl: 'wss://controly.1li.tw/ws',
-			commandUrl: window.location + '/command.json',
+			commandUrl: `${window.location.origin}${window.location.pathname}/command.json`,
+			id: initialId || undefined,
 		})
 
 		displayInstance.on('subscribed', payload => {
@@ -24,7 +28,13 @@ export const useDisplayConnection = (): UseDisplayConnectionResult => {
 		displayInstance.on('unsubscribed', payload => {
 			setShowQRcode(payload.count === 0)
 		})
-		displayInstance.on('open', setID)
+		displayInstance.on('open', newId => {
+			setID(newId)
+			// Update URL without reloading
+			const newUrl = new URL(window.location.href)
+			newUrl.searchParams.set('id', newId)
+			window.history.replaceState({}, '', newUrl.toString())
+		})
 		displayInstance.on('error', err => console.error('Display Error:', err))
 
 		displayInstance.connect()
