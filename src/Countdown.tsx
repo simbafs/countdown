@@ -8,6 +8,15 @@ export default function Countdown({ display }: { display: Display }) {
 	const [timer, setTimer] = useState<ReturnType<typeof setInterval> | null>(null)
 
 	useEffect(() => {
+		const status = {
+			minute: Math.floor(timeRemaining / 60),
+			second: timeRemaining % 60,
+			isCounting: timer !== null,
+		}
+		display.updateStatus(status)
+	}, [display, timeRemaining, timer])
+
+	useEffect(() => {
 		const tick = () => {
 			if (timeRemaining <= 0) {
 				clear()
@@ -25,13 +34,11 @@ export default function Countdown({ display }: { display: Display }) {
 		const handleStart = () => {
 			if (timer) return
 			setTimer(setInterval(tick, 1000))
-			updateStatus()
 		}
 
 		// 暫停計時
 		const handlePause = () => {
 			clear()
-			updateStatus()
 		}
 
 		// 設定時間
@@ -40,28 +47,17 @@ export default function Countdown({ display }: { display: Display }) {
 			const second = timeRemaining % 60
 			setInitTime(minute * 60 + second)
 			handleReset()
-			updateStatus()
 		}
 		const handleSecond = ({ value = 0 } = {}) => {
 			const minute = Math.floor(timeRemaining / 60)
 			const second = value
 			setInitTime(minute * 60 + second)
 			handleReset()
-			updateStatus()
 		}
 
 		const handleReset = () => {
 			clear()
 			setTimeRemaining(initTime)
-			updateStatus()
-		}
-
-		const updateStatus = () => {
-			display.updateStatus({
-				minute: Math.floor(timeRemaining / 60),
-				seond: timeRemaining % 60,
-				counting: timer !== null,
-			})
 		}
 		display.command('start', handleStart)
 		display.command('pause', handlePause)
