@@ -20,10 +20,19 @@ interface WebSocketData {
 	}
 }
 
+interface TextShadow {
+	offsetX: number
+	offsetY: number
+	blurRadius: number
+	color: string
+	enabled: boolean
+}
+
 interface Settings {
 	showHours: boolean
 	websocketPath: string
 	roundingMode: 'ceil' | 'floor' | 'round'
+	textShadow: TextShadow
 }
 
 export default function TimerDisplay() {
@@ -32,6 +41,13 @@ export default function TimerDisplay() {
 		showHours: false,
 		websocketPath: 'ws://192.168.1.171:4001/ws',
 		roundingMode: 'ceil',
+		textShadow: {
+			enabled: false,
+			offsetX: 2,
+			offsetY: 2,
+			blurRadius: 4,
+			color: '#000000',
+		},
 	})
 
 	const [showSettingsButton, setShowSettingsButton] = useState(false)
@@ -114,7 +130,25 @@ export default function TimerDisplay() {
 		const websocketPath = urlParams.get('websocketPath') || 'ws://192.168.1.171:4001/ws'
 		const roundingMode = (urlParams.get('roundingMode') as 'ceil' | 'floor' | 'round') || 'ceil'
 
-		setSettings({ showHours, websocketPath, roundingMode })
+		// Load text shadow settings
+		const textShadowEnabled = urlParams.get('textShadowEnabled') === 'true'
+		const textShadowOffsetX = Number(urlParams.get('textShadowOffsetX')) || 2
+		const textShadowOffsetY = Number(urlParams.get('textShadowOffsetY')) || 2
+		const textShadowBlurRadius = Number(urlParams.get('textShadowBlurRadius')) || 4
+		const textShadowColor = urlParams.get('textShadowColor') || '#000000'
+
+		setSettings({
+			showHours,
+			websocketPath,
+			roundingMode,
+			textShadow: {
+				enabled: textShadowEnabled,
+				offsetX: textShadowOffsetX,
+				offsetY: textShadowOffsetY,
+				blurRadius: textShadowBlurRadius,
+				color: textShadowColor,
+			},
+		})
 	}, [])
 
 	useEffect(() => {
@@ -123,6 +157,11 @@ export default function TimerDisplay() {
 		url.searchParams.set('showHours', settings.showHours.toString())
 		url.searchParams.set('websocketPath', settings.websocketPath)
 		url.searchParams.set('roundingMode', settings.roundingMode)
+		url.searchParams.set('textShadowEnabled', settings.textShadow.enabled.toString())
+		url.searchParams.set('textShadowOffsetX', settings.textShadow.offsetX.toString())
+		url.searchParams.set('textShadowOffsetY', settings.textShadow.offsetY.toString())
+		url.searchParams.set('textShadowBlurRadius', settings.textShadow.blurRadius.toString())
+		url.searchParams.set('textShadowColor', settings.textShadow.color)
 		window.history.replaceState({}, '', url.toString())
 	}, [settings])
 
@@ -214,6 +253,115 @@ export default function TimerDisplay() {
 							/>
 						</div>
 
+						{/* Text Shadow Controls */}
+						<div className="mb-4">
+							<label className="flex items-center text-black text-sm cursor-pointer mb-3">
+								<input
+									type="checkbox"
+									checked={settings.textShadow.enabled}
+									onChange={e =>
+										setSettings({
+											...settings,
+											textShadow: { ...settings.textShadow, enabled: e.target.checked },
+										})
+									}
+									className="mr-3 w-4 h-4"
+								/>
+								<span>Text Shadow</span>
+							</label>
+
+							{settings.textShadow.enabled && (
+								<div className="space-y-3 ml-7">
+									{/* Shadow Color */}
+									<div>
+										<label className="block text-black text-xs font-medium mb-1">
+											Shadow Color
+										</label>
+										<input
+											type="color"
+											value={settings.textShadow.color}
+											onChange={e =>
+												setSettings({
+													...settings,
+													textShadow: { ...settings.textShadow, color: e.target.value },
+												})
+											}
+											className="w-full h-8 border border-gray-300 rounded cursor-pointer"
+										/>
+									</div>
+
+									{/* Offset X */}
+									<div>
+										<label className="block text-black text-xs font-medium mb-1">
+											Offset X: {settings.textShadow.offsetX}px
+										</label>
+										<input
+											type="range"
+											min="-20"
+											max="20"
+											value={settings.textShadow.offsetX}
+											onChange={e =>
+												setSettings({
+													...settings,
+													textShadow: {
+														...settings.textShadow,
+														offsetX: Number(e.target.value),
+													},
+												})
+											}
+											className="w-full"
+										/>
+									</div>
+
+									{/* Offset Y */}
+									<div>
+										<label className="block text-black text-xs font-medium mb-1">
+											Offset Y: {settings.textShadow.offsetY}px
+										</label>
+										<input
+											type="range"
+											min="-20"
+											max="20"
+											value={settings.textShadow.offsetY}
+											onChange={e =>
+												setSettings({
+													...settings,
+													textShadow: {
+														...settings.textShadow,
+														offsetY: Number(e.target.value),
+													},
+												})
+											}
+											className="w-full"
+										/>
+									</div>
+
+									{/* Blur Radius */}
+									<div>
+										<label className="block text-black text-xs font-medium mb-1">
+											Blur Radius: {settings.textShadow.blurRadius}px
+										</label>
+										<input
+											type="range"
+											min="0"
+											max="20"
+											value={settings.textShadow.blurRadius}
+											onChange={e =>
+												setSettings({
+													...settings,
+													textShadow: {
+														...settings.textShadow,
+														blurRadius: Number(e.target.value),
+													},
+												})
+											}
+											className="w-full"
+										/>
+									</div>
+								</div>
+							)}
+						</div>
+
 						{/* Close hint */}
 						<div className="text-gray-400 text-xs italic">Move cursor away to close</div>
 					</div>
@@ -232,6 +380,9 @@ export default function TimerDisplay() {
 								maxWidth: '100vw',
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
+								textShadow: settings.textShadow.enabled
+									? `${settings.textShadow.offsetX}px ${settings.textShadow.offsetY}px ${settings.textShadow.blurRadius}px ${settings.textShadow.color}`
+									: 'none',
 							}}
 						>
 							{formatTime(timerData.current)}
@@ -247,6 +398,9 @@ export default function TimerDisplay() {
 								maxWidth: '100vw',
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
+								textShadow: settings.textShadow.enabled
+									? `${settings.textShadow.offsetX}px ${settings.textShadow.offsetY}px ${settings.textShadow.blurRadius}px ${settings.textShadow.color}`
+									: 'none',
 							}}
 						>
 							{settings.showHours ? '--:--:--' : '--:--'}
