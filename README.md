@@ -1,69 +1,83 @@
-# React + TypeScript + Vite
+# Timer Display
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A timer display application that connects to a WebSocket source and shows real-time timer data.
 
-Currently, two official plugins are available:
+## WebSocket Data Source
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Connects to: `ws://192.168.1.171:4001/ws`
 
-## Expanding the ESLint configuration
+Receives data in format:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-	globalIgnores(['dist']),
-	{
-		files: ['**/*.{ts,tsx}'],
-		extends: [
-			// Other configs...
-
-			// Remove tseslint.configs.recommended and replace with this
-			...tseslint.configs.recommendedTypeChecked,
-			// Alternatively, use this for stricter rules
-			...tseslint.configs.strictTypeChecked,
-			// Optionally, add this for stylistic rules
-			...tseslint.configs.stylisticTypeChecked,
-
-			// Other configs...
-		],
-		languageOptions: {
-			parserOptions: {
-				project: ['./tsconfig.node.json', './tsconfig.app.json'],
-				tsconfigRootDir: import.meta.dirname,
-			},
-			// other options...
+```json
+{
+	"tag": "runtime-data",
+	"payload": {
+		"timer": {
+			"addedTime": 0,
+			"current": 2850989,
+			"duration": 3000000,
+			"elapsed": 149011,
+			"expectedFinish": 75249294,
+			"phase": "default",
+			"playback": "play",
+			"secondaryTimer": null,
+			"startedAt": 72249294
 		},
-	},
-])
+		"clock": 72398305
+	}
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- ✅ Real-time timer display with milliseconds
+- ✅ Automatic WebSocket connection with reconnection
+- ✅ Connection status indicator
+- ✅ Play/pause status display
+- ✅ Additional timer metrics (duration, elapsed, added time, phase)
+- ✅ Responsive design for mobile and desktop
+- ✅ Dark theme with Tailwind CSS
+- ✅ Error handling and manual reconnection
 
-export default tseslint.config([
-	globalIgnores(['dist']),
-	{
-		files: ['**/*.{ts,tsx}'],
-		extends: [
-			// Other configs...
-			// Enable lint rules for React
-			reactX.configs['recommended-typescript'],
-			// Enable lint rules for React DOM
-			reactDom.configs.recommended,
-		],
-		languageOptions: {
-			parserOptions: {
-				project: ['./tsconfig.node.json', './tsconfig.app.json'],
-				tsconfigRootDir: import.meta.dirname,
-			},
-			// other options...
-		},
-	},
-])
+## Setup with pnpm
+
+### Install dependencies
+
+```bash
+pnpm install
 ```
+
+### Start development server
+
+```bash
+pnpm run dev
+```
+
+### Build for production
+
+```bash
+pnpm run build
+```
+
+### Preview production build
+
+```bash
+pnpm run preview
+```
+
+## Usage
+
+1. Start the application: `pnpm run dev`
+2. Open http://localhost:5173 (or the port shown)
+3. The timer will automatically connect to the WebSocket source
+4. View the current timer time in large display
+5. Additional metrics shown below the main timer
+
+## Timer Display Format
+
+- **Main Display**: MM:SS.cs (minutes:seconds:centiseconds)
+- **Duration**: Total timer duration
+- **Elapsed**: Time already elapsed
+- **Added Time**: Any additional time added
+- **Phase**: Current timer phase
+- **Status**: Connected/Disconnected and Playing/Paused

@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+@layer base {
+	body {
+		background: transparent;
+		overflow: hidden;
+	}
+
+	html,
+	#root {
+		background: transparent;
+	}
+}
