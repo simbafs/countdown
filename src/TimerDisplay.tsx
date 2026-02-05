@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useDynamicTextSize } from './useDynamicTextSize'
 
 interface TimerData {
 	addedTime: number
@@ -54,6 +55,10 @@ export default function TimerDisplay() {
 	const wsRef = useRef<WebSocket | null>(null)
 	const reconnectTimeoutRef = useRef<number | null>(null)
 
+	// Container refs for dynamic text sizing
+	const activeTimerContainerRef = useRef<HTMLDivElement>(null)
+	const placeholderContainerRef = useRef<HTMLDivElement>(null)
+
 	const formatTime = (milliseconds: number): string => {
 		let totalSeconds: number
 		switch (settings.roundingMode) {
@@ -80,6 +85,24 @@ export default function TimerDisplay() {
 
 		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 	}
+
+	// Dynamic text sizing for active timer
+	const activeTimerText = timerData ? formatTime(timerData.current) : ''
+	const { fontSize: activeFontSize, elementRef: activeTimerRef } = useDynamicTextSize({
+		text: activeTimerText,
+		minFontSize: 10,
+		maxFontSize: 1000,
+		containerRef: activeTimerContainerRef,
+	})
+
+	// Dynamic text sizing for placeholder
+	const placeholderText = settings.showHours ? '--:--:--' : '--:--'
+	const { fontSize: placeholderFontSize, elementRef: placeholderRef } = useDynamicTextSize({
+		text: placeholderText,
+		minFontSize: 10,
+		maxFontSize: 1000,
+		containerRef: placeholderContainerRef,
+	})
 
 	const connect = () => {
 		if (wsRef.current) {
@@ -371,11 +394,15 @@ export default function TimerDisplay() {
 			{/* Timer Display */}
 			<div className="text-center w-full h-full flex items-center justify-center">
 				{timerData ? (
-					<div className="text-black w-full overflow-hidden">
+					<div
+						ref={activeTimerContainerRef}
+						className="text-black w-full h-full overflow-hidden flex items-center justify-center"
+					>
 						<div
+							ref={activeTimerRef}
 							className="font-mono font-bold tabular-nums leading-none whitespace-nowrap text-center"
 							style={{
-								fontSize: settings.showHours ? 'min(25vw, 25vh)' : 'min(45vw, 45vh)',
+								fontSize: `${activeFontSize}px`,
 								width: '100%',
 								maxWidth: '100vw',
 								overflow: 'hidden',
@@ -385,15 +412,19 @@ export default function TimerDisplay() {
 									: 'none',
 							}}
 						>
-							{formatTime(timerData.current)}
+							{activeTimerText}
 						</div>
 					</div>
 				) : (
-					<div className="text-black w-full overflow-hidden">
+					<div
+						ref={placeholderContainerRef}
+						className="text-black w-full h-full overflow-hidden flex items-center justify-center"
+					>
 						<div
+							ref={placeholderRef}
 							className="font-mono font-bold tabular-nums leading-none whitespace-nowrap text-center"
 							style={{
-								fontSize: settings.showHours ? 'min(25vw, 25vh)' : 'min(45vw, 45vh)',
+								fontSize: `${placeholderFontSize}px`,
 								width: '100%',
 								maxWidth: '100vw',
 								overflow: 'hidden',
@@ -403,7 +434,7 @@ export default function TimerDisplay() {
 									: 'none',
 							}}
 						>
-							{settings.showHours ? '--:--:--' : '--:--'}
+							{placeholderText}
 						</div>
 					</div>
 				)}
