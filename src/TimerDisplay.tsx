@@ -13,10 +13,20 @@ interface TimerData {
 	startedAt: number
 }
 
+interface AuxTimer {
+	duration: number
+	current: number
+	playback: string
+	direction: string
+}
+
 interface WebSocketData {
 	tag: string
 	payload: {
 		timer: TimerData
+		auxtimer1?: AuxTimer
+		auxtimer2?: AuxTimer
+		auxtimer3?: AuxTimer
 		clock: number
 	}
 }
@@ -34,10 +44,16 @@ interface Settings {
 	websocketPath: string
 	roundingMode: 'ceil' | 'floor' | 'round'
 	textShadow: TextShadow
+	selectedTimer: 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3'
 }
 
 export default function TimerDisplay() {
 	const [timerData, setTimerData] = useState<TimerData | null>(null)
+	const [auxTimers, setAuxTimers] = useState<Record<string, AuxTimer | null | undefined>>({
+		auxtimer1: undefined,
+		auxtimer2: undefined,
+		auxtimer3: undefined,
+	})
 	const [settings, setSettings] = useState<Settings>({
 		showHours: false,
 		websocketPath: 'ws://192.168.1.171:4001/ws',
@@ -49,6 +65,7 @@ export default function TimerDisplay() {
 			blurRadius: 4,
 			color: '#000000',
 		},
+		selectedTimer: 'main',
 	})
 
 	const [showSettingsButton, setShowSettingsButton] = useState(false)
@@ -86,10 +103,33 @@ export default function TimerDisplay() {
 		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 	}
 
+	// Get the current timer data based on selection
+	const getCurrentTimerData = () => {
+		switch (settings.selectedTimer) {
+			case 'auxtimer1':
+				return auxTimers.auxtimer1
+			case 'auxtimer2':
+				return auxTimers.auxtimer2
+			case 'auxtimer3':
+				return auxTimers.auxtimer3
+			default:
+				return timerData
+		}
+	}
+
+	// Convert timer data to display text
+	const getTimerText = (timer: TimerData | AuxTimer | null | undefined): string => {
+		if (!timer) return settings.showHours ? '--:--:--' : '--:--'
+
+		// For both main and aux timers, use the same formatTime function
+		return formatTime(timer.current)
+	}
+
 	// Dynamic text sizing for active timer
-	const activeTimerText = timerData ? formatTime(timerData.current) : ''
+	const currentTimerData = getCurrentTimerData()
+	const timerText = getTimerText(currentTimerData)
 	const { fontSize: activeFontSize, elementRef: activeTimerRef } = useDynamicTextSize({
-		text: activeTimerText,
+		text: timerText,
 		minFontSize: 10,
 		maxFontSize: 1000,
 		containerRef: activeTimerContainerRef,
@@ -121,8 +161,20 @@ export default function TimerDisplay() {
 				try {
 					const data: WebSocketData = JSON.parse(event.data)
 
-					if (data.tag === 'runtime-data' && data.payload.timer) {
-						setTimerData(data.payload.timer)
+					if (data.tag === 'runtime-data') {
+						if (data.payload.timer) {
+							setTimerData(data.payload.timer)
+						}
+						// Handle auxiliary timers
+						if (data.payload.auxtimer1) {
+							setAuxTimers(prev => ({ ...prev, auxtimer1: data.payload.auxtimer1 }))
+						}
+						if (data.payload.auxtimer2) {
+							setAuxTimers(prev => ({ ...prev, auxtimer2: data.payload.auxtimer2 }))
+						}
+						if (data.payload.auxtimer3) {
+							setAuxTimers(prev => ({ ...prev, auxtimer3: data.payload.auxtimer3 }))
+						}
 					}
 				} catch (error) {
 					console.error('Error parsing WebSocket message:', error)
@@ -159,6 +211,8 @@ export default function TimerDisplay() {
 		const textShadowOffsetY = Number(urlParams.get('textShadowOffsetY')) || 2
 		const textShadowBlurRadius = Number(urlParams.get('textShadowBlurRadius')) || 4
 		const textShadowColor = urlParams.get('textShadowColor') || '#000000'
+		const selectedTimer =
+			(urlParams.get('selectedTimer') as 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3') || 'main'
 
 		setSettings({
 			showHours,
@@ -171,6 +225,7 @@ export default function TimerDisplay() {
 				blurRadius: textShadowBlurRadius,
 				color: textShadowColor,
 			},
+			selectedTimer,
 		})
 	}, [])
 
@@ -185,6 +240,7 @@ export default function TimerDisplay() {
 		url.searchParams.set('textShadowOffsetY', settings.textShadow.offsetY.toString())
 		url.searchParams.set('textShadowBlurRadius', settings.textShadow.blurRadius.toString())
 		url.searchParams.set('textShadowColor', settings.textShadow.color)
+		url.searchParams.set('selectedTimer', settings.selectedTimer)
 		window.history.replaceState({}, '', url.toString())
 	}, [settings])
 
@@ -385,6 +441,30 @@ export default function TimerDisplay() {
 							)}
 						</div>
 
+						{/* Timer Selection */}
+						<div className="mb-4">
+							<label className="block text-black text-sm font-medium mb-2">Timer Selection</label>
+							<select
+								value={settings.selectedTimer}
+								onChange={e =>
+									setSettings({
+										...settings,
+										selectedTimer: e.target.value as
+											| 'main'
+											| 'auxtimer1'
+											| 'auxtimer2'
+											| 'auxtimer3',
+									})
+								}
+								className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+							>
+								<option value="main">Main Timer</option>
+								<option value="auxtimer1">Aux Timer 1</option>
+								<option value="auxtimer2">Aux Timer 2</option>
+								<option value="auxtimer3">Aux Timer 3</option>
+							</select>
+						</div>
+
 						{/* Close hint */}
 						<div className="text-gray-400 text-xs italic">Move cursor away to close</div>
 					</div>
@@ -412,7 +492,7 @@ export default function TimerDisplay() {
 									: 'none',
 							}}
 						>
-							{activeTimerText}
+							{timerText}
 						</div>
 					</div>
 				) : (
