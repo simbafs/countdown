@@ -130,7 +130,7 @@ src/
 
 ## Project-Specific Notes
 
-- Main application connects to `ws://192.168.1.171:4001/ws`
+- Main application connects to `ws://localhost:4001/ws`
 - Timer data format: `{tag, payload: {timer: TimerData, clock: number}}`
 - Settings are persisted in URL query parameters
 - No external API dependencies besides the WebSocket connection

@@ -56,7 +56,7 @@ export default function TimerDisplay() {
 	})
 	const [settings, setSettings] = useState<Settings>({
 		showHours: false,
-		websocketPath: 'ws://192.168.1.171:4001/ws',
+		websocketPath: 'ws://localhost:4001/ws',
 		roundingMode: 'ceil',
 		textShadow: {
 			enabled: false,
@@ -202,7 +202,7 @@ export default function TimerDisplay() {
 		// Load settings from query string
 		const urlParams = new URLSearchParams(window.location.search)
 		const showHours = urlParams.get('showHours') === 'true'
-		const websocketPath = urlParams.get('websocketPath') || 'ws://192.168.1.171:4001/ws'
+		const websocketPath = urlParams.get('websocketPath') || 'ws://localhost:4001/ws'
 		const roundingMode = (urlParams.get('roundingMode') as 'ceil' | 'floor' | 'round') || 'ceil'
 
 		// Load text shadow settings
@@ -328,7 +328,7 @@ export default function TimerDisplay() {
 								value={settings.websocketPath}
 								onChange={e => setSettings({ ...settings, websocketPath: e.target.value })}
 								className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-								placeholder="ws://192.168.1.171:4001/ws"
+								placeholder="ws://localhost:4001/ws"
 							/>
 						</div>
 

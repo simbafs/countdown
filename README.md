@@ -4,7 +4,7 @@ A timer display application that connects to a WebSocket source and shows real-t
 
 ## WebSocket Data Source
 
-Connects to: `ws://192.168.1.171:4001/ws`
+Connects to: `ws://localhost:4001/ws`
 
 Receives data in format:
 
