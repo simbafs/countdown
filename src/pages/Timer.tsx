@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import HoverMenu from '../components/HoverMenu'
 import { useDynamicTextSize } from '../hooks/useDynamicTextSize'
 import { useWebsocket } from '../hooks/useWebsocket'
@@ -124,7 +124,7 @@ export default function Timer() {
 		containerRef: placeholderContainerRef,
 	})
 
-	useWebsocket(settings.websocketPath, (event, data) => {
+	const handler = useCallback((event: string, data: any) => {
 		switch (event) {
 			case 'timer':
 				setTimerData(data as TimerData)
@@ -141,7 +141,9 @@ export default function Timer() {
 			default:
 				return false
 		}
-	}, {
+	}, [setTimerData, setAuxTimers])
+
+	useWebsocket(settings.websocketPath, handler, {
 		ignoreOtherTags: true,
 		ignoreUnhandledEvents: true,
 	})
