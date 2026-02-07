@@ -19,6 +19,7 @@ This document contains development guidelines and commands for agentic coding ag
 ### Testing
 
 This project currently has no test suite configured. When adding tests, use Vitest for React testing:
+
 - Install: `pnpm add -D vitest @testing-library/react @testing-library/jest-dom jsdom`
 - Add to package.json: `"test": "vitest", "test:ui": "vitest --ui"`
 - Run single test: `pnpm test TimerDisplay.test.tsx`

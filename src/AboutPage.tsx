@@ -21,8 +21,8 @@ export default function AboutPage() {
 				<div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
 					<h2 className="text-xl font-semibold text-gray-800 mb-3">Usage</h2>
 					<p className="text-gray-700">
-						Configure the WebSocket endpoint to connect to your timer source. The application will automatically
-						handle reconnections and display the timer data in real-time.
+						Configure the WebSocket endpoint to connect to your timer source. The application will
+						automatically handle reconnections and display the timer data in real-time.
 					</p>
 				</div>
 			</div>

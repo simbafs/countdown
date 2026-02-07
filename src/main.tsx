@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import './style.css'
-import Layout from './Layout'
-import TimerDisplay from './TimerDisplay'
 import AboutPage from './AboutPage'
-import SettingsPage from './SettingsPage'
 import DebugPage from './DebugPage'
+import Layout from './Layout'
+import SettingsPage from './SettingsPage'
+import './style.css'
+import TimerDisplay from './TimerDisplay'
 
 const router = createBrowserRouter([
 	{

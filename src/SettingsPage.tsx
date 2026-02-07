@@ -27,10 +27,18 @@ export default function SettingsPage() {
 				<div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
 					<h2 className="text-xl font-semibold text-gray-800 mb-3">Information</h2>
 					<ul className="space-y-2 text-gray-700">
-						<li><strong>Version:</strong> 1.0.0</li>
-						<li><strong>Build:</strong> Production</li>
-						<li><strong>Framework:</strong> React + TypeScript</li>
-						<li><strong>Styling:</strong> Tailwind CSS</li>
+						<li>
+							<strong>Version:</strong> 1.0.0
+						</li>
+						<li>
+							<strong>Build:</strong> Production
+						</li>
+						<li>
+							<strong>Framework:</strong> React + TypeScript
+						</li>
+						<li>
+							<strong>Styling:</strong> Tailwind CSS
+						</li>
 					</ul>
 				</div>
 			</div>

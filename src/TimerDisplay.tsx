@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import HoverMenu from './HoverMenu'
 import { useDynamicTextSize } from './useDynamicTextSize'
 
 interface TimerData {
@@ -68,7 +69,6 @@ export default function TimerDisplay() {
 		selectedTimer: 'main',
 	})
 
-	const [showSettingsButton, setShowSettingsButton] = useState(false)
 	const wsRef = useRef<WebSocket | null>(null)
 	const reconnectTimeoutRef = useRef<number | null>(null)
 	const activeTimerContainerRef = useRef<HTMLDivElement>(null)
@@ -259,201 +259,185 @@ export default function TimerDisplay() {
 	return (
 		<div className="text-center w-full h-full overflow-hidden flex items-center justify-center relative">
 			{/* Settings Options - Show on hover */}
-			<div
-				className="absolute top-4 right-4"
-				onMouseEnter={() => setShowSettingsButton(true)}
-				onMouseLeave={() => setShowSettingsButton(false)}
-			>
-				<div
-					className={`transition-all duration-200 transform-gpu ${
-						showSettingsButton ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-					}`}
-				>
-					<div className="bg-white border-2 border-gray-300 rounded-xl shadow-xl p-6 min-w-64">
-						<h3 className="text-black font-semibold mb-4">Settings</h3>
+			<HoverMenu position="top-right">
+				<div className="bg-white border-2 border-gray-300 rounded-xl shadow-xl p-6 min-w-64">
+					<h3 className="text-black font-semibold mb-4">Settings</h3>
 
-						{/* Show Hours Toggle */}
-						<div className="mb-4">
-							<label className="flex items-center text-black text-sm cursor-pointer">
-								<input
-									type="checkbox"
-									checked={settings.showHours}
-									onChange={e => setSettings({ ...settings, showHours: e.target.checked })}
-									className="mr-3 w-4 h-4"
-								/>
-								<span>Show Hours</span>
-							</label>
-						</div>
-
-						{/* Rounding Mode */}
-						<div className="mb-4">
-							<label className="block text-black text-sm font-medium mb-2">Rounding Mode</label>
-							<select
-								value={settings.roundingMode}
-								onChange={e =>
-									setSettings({
-										...settings,
-										roundingMode: e.target.value as 'ceil' | 'floor' | 'round',
-									})
-								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-							>
-								<option value="ceil">Ceil (Round Up)</option>
-								<option value="floor">Floor (Round Down)</option>
-								<option value="round">Round (Nearest)</option>
-							</select>
-						</div>
-
-						{/* WebSocket Path */}
-						<div className="mb-4">
-							<label className="block text-black text-sm font-medium mb-2">WebSocket Path</label>
+					{/* Show Hours Toggle */}
+					<div className="mb-4">
+						<label className="flex items-center text-black text-sm cursor-pointer">
 							<input
-								type="text"
-								value={settings.websocketPath}
-								onChange={e => setSettings({ ...settings, websocketPath: e.target.value })}
-								className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-								placeholder="ws://localhost:4001/ws"
+								type="checkbox"
+								checked={settings.showHours}
+								onChange={e => setSettings({ ...settings, showHours: e.target.checked })}
+								className="mr-3 w-4 h-4"
 							/>
-						</div>
+							<span>Show Hours</span>
+						</label>
+					</div>
 
-						{/* Text Shadow Controls */}
-						<div className="mb-4">
-							<label className="flex items-center text-black text-sm cursor-pointer mb-3">
-								<input
-									type="checkbox"
-									checked={settings.textShadow.enabled}
-									onChange={e =>
-										setSettings({
-											...settings,
-											textShadow: { ...settings.textShadow, enabled: e.target.checked },
-										})
-									}
-									className="mr-3 w-4 h-4"
-								/>
-								<span>Text Shadow</span>
-							</label>
+					{/* Rounding Mode */}
+					<div className="mb-4">
+						<label className="block text-black text-sm font-medium mb-2">Rounding Mode</label>
+						<select
+							value={settings.roundingMode}
+							onChange={e =>
+								setSettings({
+									...settings,
+									roundingMode: e.target.value as 'ceil' | 'floor' | 'round',
+								})
+							}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						>
+							<option value="ceil">Ceil (Round Up)</option>
+							<option value="floor">Floor (Round Down)</option>
+							<option value="round">Round (Nearest)</option>
+						</select>
+					</div>
 
-							{settings.textShadow.enabled && (
-								<div className="space-y-3 ml-7">
-									{/* Shadow Color */}
-									<div>
-										<label className="block text-black text-xs font-medium mb-1">
-											Shadow Color
-										</label>
-										<input
-											type="color"
-											value={settings.textShadow.color}
-											onChange={e =>
-												setSettings({
-													...settings,
-													textShadow: { ...settings.textShadow, color: e.target.value },
-												})
-											}
-											className="w-full h-8 border border-gray-300 rounded cursor-pointer"
-										/>
-									</div>
+					{/* WebSocket Path */}
+					<div className="mb-4">
+						<label className="block text-black text-sm font-medium mb-2">WebSocket Path</label>
+						<input
+							type="text"
+							value={settings.websocketPath}
+							onChange={e => setSettings({ ...settings, websocketPath: e.target.value })}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+							placeholder="ws://localhost:4001/ws"
+						/>
+					</div>
 
-									{/* Offset X */}
-									<div>
-										<label className="block text-black text-xs font-medium mb-1">
-											Offset X: {settings.textShadow.offsetX}px
-										</label>
-										<input
-											type="range"
-											min="-20"
-											max="20"
-											value={settings.textShadow.offsetX}
-											onChange={e =>
-												setSettings({
-													...settings,
-													textShadow: {
-														...settings.textShadow,
-														offsetX: Number(e.target.value),
-													},
-												})
-											}
-											className="w-full"
-										/>
-									</div>
-
-									{/* Offset Y */}
-									<div>
-										<label className="block text-black text-xs font-medium mb-1">
-											Offset Y: {settings.textShadow.offsetY}px
-										</label>
-										<input
-											type="range"
-											min="-20"
-											max="20"
-											value={settings.textShadow.offsetY}
-											onChange={e =>
-												setSettings({
-													...settings,
-													textShadow: {
-														...settings.textShadow,
-														offsetY: Number(e.target.value),
-													},
-												})
-											}
-											className="w-full"
-										/>
-									</div>
-
-									{/* Blur Radius */}
-									<div>
-										<label className="block text-black text-xs font-medium mb-1">
-											Blur Radius: {settings.textShadow.blurRadius}px
-										</label>
-										<input
-											type="range"
-											min="0"
-											max="20"
-											value={settings.textShadow.blurRadius}
-											onChange={e =>
-												setSettings({
-													...settings,
-													textShadow: {
-														...settings.textShadow,
-														blurRadius: Number(e.target.value),
-													},
-												})
-											}
-											className="w-full"
-										/>
-									</div>
-								</div>
-							)}
-						</div>
-
-						{/* Timer Selection */}
-						<div className="mb-4">
-							<label className="block text-black text-sm font-medium mb-2">Timer Selection</label>
-							<select
-								value={settings.selectedTimer}
+					{/* Text Shadow Controls */}
+					<div className="mb-4">
+						<label className="flex items-center text-black text-sm cursor-pointer mb-3">
+							<input
+								type="checkbox"
+								checked={settings.textShadow.enabled}
 								onChange={e =>
 									setSettings({
 										...settings,
-										selectedTimer: e.target.value as
-											| 'main'
-											| 'auxtimer1'
-											| 'auxtimer2'
-											| 'auxtimer3',
+										textShadow: { ...settings.textShadow, enabled: e.target.checked },
 									})
 								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-							>
-								<option value="main">Main Timer</option>
-								<option value="auxtimer1">Aux Timer 1</option>
-								<option value="auxtimer2">Aux Timer 2</option>
-								<option value="auxtimer3">Aux Timer 3</option>
-							</select>
-						</div>
+								className="mr-3 w-4 h-4"
+							/>
+							<span>Text Shadow</span>
+						</label>
 
-						{/* Close hint */}
-						<div className="text-gray-400 text-xs italic">Move cursor away to close</div>
+						{settings.textShadow.enabled && (
+							<div className="space-y-3 ml-7">
+								{/* Shadow Color */}
+								<div>
+									<label className="block text-black text-xs font-medium mb-1">Shadow Color</label>
+									<input
+										type="color"
+										value={settings.textShadow.color}
+										onChange={e =>
+											setSettings({
+												...settings,
+												textShadow: { ...settings.textShadow, color: e.target.value },
+											})
+										}
+										className="w-full h-8 border border-gray-300 rounded cursor-pointer"
+									/>
+								</div>
+
+								{/* Offset X */}
+								<div>
+									<label className="block text-black text-xs font-medium mb-1">
+										Offset X: {settings.textShadow.offsetX}px
+									</label>
+									<input
+										type="range"
+										min="-20"
+										max="20"
+										value={settings.textShadow.offsetX}
+										onChange={e =>
+											setSettings({
+												...settings,
+												textShadow: {
+													...settings.textShadow,
+													offsetX: Number(e.target.value),
+												},
+											})
+										}
+										className="w-full"
+									/>
+								</div>
+
+								{/* Offset Y */}
+								<div>
+									<label className="block text-black text-xs font-medium mb-1">
+										Offset Y: {settings.textShadow.offsetY}px
+									</label>
+									<input
+										type="range"
+										min="-20"
+										max="20"
+										value={settings.textShadow.offsetY}
+										onChange={e =>
+											setSettings({
+												...settings,
+												textShadow: {
+													...settings.textShadow,
+													offsetY: Number(e.target.value),
+												},
+											})
+										}
+										className="w-full"
+									/>
+								</div>
+
+								{/* Blur Radius */}
+								<div>
+									<label className="block text-black text-xs font-medium mb-1">
+										Blur Radius: {settings.textShadow.blurRadius}px
+									</label>
+									<input
+										type="range"
+										min="0"
+										max="20"
+										value={settings.textShadow.blurRadius}
+										onChange={e =>
+											setSettings({
+												...settings,
+												textShadow: {
+													...settings.textShadow,
+													blurRadius: Number(e.target.value),
+												},
+											})
+										}
+										className="w-full"
+									/>
+								</div>
+							</div>
+						)}
 					</div>
+
+					{/* Timer Selection */}
+					<div className="mb-4">
+						<label className="block text-black text-sm font-medium mb-2">Timer Selection</label>
+						<select
+							value={settings.selectedTimer}
+							onChange={e =>
+								setSettings({
+									...settings,
+									selectedTimer: e.target.value as 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3',
+								})
+							}
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						>
+							<option value="main">Main Timer</option>
+							<option value="auxtimer1">Aux Timer 1</option>
+							<option value="auxtimer2">Aux Timer 2</option>
+							<option value="auxtimer3">Aux Timer 3</option>
+						</select>
+					</div>
+
+					{/* Close hint */}
+					<div className="text-gray-400 text-xs italic">Move cursor away to close</div>
 				</div>
-			</div>
+			</HoverMenu>
 
 			{/* Timer Display */}
 			{timerData ? (

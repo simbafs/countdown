@@ -22,14 +22,16 @@ export default function DebugPage() {
 	return (
 		<div className="max-w-4xl mx-auto p-8">
 			<h1 className="text-4xl font-bold text-gray-800 mb-6">Debug Information</h1>
-			
+
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				<div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
 					<h2 className="text-xl font-semibold text-gray-800 mb-4">System Status</h2>
 					<div className="space-y-3">
 						<div className="flex justify-between">
 							<span className="text-gray-600">WebSocket:</span>
-							<span className={`font-mono ${debugInfo.webSocketStatus === 'connected' ? 'text-green-600' : 'text-red-600'}`}>
+							<span
+								className={`font-mono ${debugInfo.webSocketStatus === 'connected' ? 'text-green-600' : 'text-red-600'}`}
+							>
 								{debugInfo.webSocketStatus}
 							</span>
 						</div>
