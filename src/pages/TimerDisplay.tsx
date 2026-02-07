@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import HoverMenu from './HoverMenu'
-import { useDynamicTextSize } from './useDynamicTextSize'
+import HoverMenu from '../components/HoverMenu'
+import { useDynamicTextSize } from '../hooks/useDynamicTextSize'
 
 interface TimerData {
 	addedTime: number

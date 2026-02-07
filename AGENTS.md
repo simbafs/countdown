@@ -2,6 +2,12 @@
 
 This document contains development guidelines and commands for agentic coding agents working in this repository.
 
+## TOP RULES
+
+you must follow these rules
+
+1. never commit unless my clear instructions
+
 ## Build Commands
 
 ### Development
@@ -118,12 +124,18 @@ This project currently has no test suite configured. When adding tests, use Vite
 
 ```
 src/
-├── main.tsx              # Application entry point
-├── style.css             # Global styles and Tailwind imports
-├── TimerDisplay.tsx      # Main timer component
-├── useDynamicTextSize.ts # Custom hook for dynamic text sizing
-├── WebSocketTest.tsx     # WebSocket testing utility
-└── counter.ts            # Counter utilities
+├── main.tsx                  # Application entry point
+├── style.css                 # Global styles and Tailwind imports
+├── components/               # Reusable UI components
+│   ├── Layout.tsx           # Shared layout component
+│   └── HoverMenu.tsx       # Reusable hover menu component
+├── hooks/                   # Custom React hooks
+│   └── useDynamicTextSize.ts # Dynamic text sizing hook
+└── pages/                   # Page components
+    ├── TimerDisplay.tsx    # Main timer display page
+    ├── AboutPage.tsx        # About page
+    ├── SettingsPage.tsx     # General settings page
+    └── DebugPage.tsx         # Debug information page
 ```
 
 ## Development Workflow
