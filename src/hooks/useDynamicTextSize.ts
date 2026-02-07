@@ -54,6 +54,8 @@ export const useDynamicTextSize = (options: UseDynamicTextSizeOptions = {}) => {
 			}
 		}
 
+		low -= 20 // padding, 20 is an arbitrary value 
+
 		// Set final font size
 		element.style.fontSize = `${low}px`
 

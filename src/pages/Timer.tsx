@@ -59,8 +59,6 @@ export default function Timer() {
 		selectedTimer: 'main',
 	})
 
-	const wsRef = useRef<WebSocket | null>(null)
-	const reconnectTimeoutRef = useRef<number | null>(null)
 	const activeTimerContainerRef = useRef<HTMLDivElement>(null)
 	const placeholderContainerRef = useRef<HTMLDivElement>(null)
 
@@ -189,19 +187,6 @@ export default function Timer() {
 		url.searchParams.set('selectedTimer', settings.selectedTimer)
 		window.history.replaceState({}, '', url.toString())
 	}, [settings])
-
-	useEffect(() => {
-		return () => {
-			if (reconnectTimeoutRef.current) {
-				clearTimeout(reconnectTimeoutRef.current)
-				reconnectTimeoutRef.current = null
-			}
-			if (wsRef.current) {
-				wsRef.current.close()
-				wsRef.current = null
-			}
-		}
-	}, [])
 
 	return (
 		<div className="text-center w-full h-full overflow-hidden flex items-center justify-center relative">
