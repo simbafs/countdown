@@ -2,7 +2,10 @@ import { useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 
 
-export function useWebsocket(url: string, handler: (event: string, data: any) => boolean) {
+export function useWebsocket(url: string, handler: (event: string, data: any) => boolean, options = {
+    ignoreOtherTags: false,
+    ignoreUnhandledEvents: false,
+}) {
     const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(url);
 
     useEffect(() => {
@@ -11,15 +14,15 @@ export function useWebsocket(url: string, handler: (event: string, data: any) =>
             if (tag === 'runtime-data') {
                 for (const [event, data] of Object.entries(payload)) {
                     const handled = handler(event, data);
-                    if (!handled) {
+                    if (!handled && !options.ignoreUnhandledEvents) {
                         console.warn(`Unhandled event of ${tag}: ${event}`, data);
                     }
                 }
-            } else {
+            } else if (!options.ignoreOtherTags) {
                 console.info(`Received message with tag: ${tag}`, payload);
             }
         }
-    }, [lastJsonMessage, handler]);
+    }, [lastJsonMessage, handler, options.ignoreOtherTags, options.ignoreUnhandledEvents]);
 
     return {
         send: sendJsonMessage,

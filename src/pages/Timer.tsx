@@ -141,6 +141,9 @@ export default function Timer() {
 			default:
 				return false
 		}
+	}, {
+		ignoreOtherTags: true,
+		ignoreUnhandledEvents: true,
 	})
 
 	useEffect(() => {
