@@ -1,20 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Layout from './components/Layout'
-import Timer from './pages/Timer'
+import Layout, { pages } from './components/Layout'
 import './style.css'
 
 const router = createBrowserRouter([
 	{
 		path: '/',
 		element: <Layout />,
-		children: [
-			{
-				index: true,
-				element: <Timer />,
-			},
-		],
+		children: pages
 	},
 ])
 

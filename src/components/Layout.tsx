@@ -1,17 +1,15 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import HoverMenu from './HoverMenu'
+import Timer from '../pages/Timer'
 
 interface Page {
 	name: string
 	path: string
-	icon: string
+	element: React.ReactNode
 }
 
-const pages: Page[] = [
-	{ name: 'Timer', path: '/', icon: '⏱️' },
-	{ name: 'About', path: '/about', icon: 'ℹ️' },
-	{ name: 'Settings', path: '/settings', icon: '⚙️' },
-	{ name: 'Debug', path: '/debug', icon: '🔧' },
+export const pages: Page[] = [
+	{ name: 'Timer', path: '/', element: <Timer /> },
 ]
 
 export default function Layout() {
@@ -33,13 +31,11 @@ export default function Layout() {
 							<Link
 								key={page.path}
 								to={page.path}
-								className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${
-									location.pathname === page.path
-										? 'bg-blue-100 text-blue-700'
-										: 'text-gray-700 hover:bg-gray-100'
-								}`}
+								className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${location.pathname === page.path
+									? 'bg-blue-100 text-blue-700'
+									: 'text-gray-700 hover:bg-gray-100'
+									}`}
 							>
-								<span className="text-lg">{page.icon}</span>
 								<span>{page.name}</span>
 							</Link>
 						))}
