@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import HoverMenu from './HoverMenu'
 import Timer from '../pages/Timer'
 import WebSocketDebugPage from '../pages/WebSocketDebugPage'
@@ -10,7 +10,7 @@ interface Page {
 	element: React.ReactNode
 }
 
-export const pages: Page[] = [
+const pages: Page[] = [
 	{ name: 'Timer', path: '/', element: <Timer /> },
 	{ name: 'Card', path: '/card', element: <Card /> },
 	{ name: 'WebSocket Debug', path: '/debug', element: <WebSocketDebugPage /> },
@@ -23,7 +23,11 @@ export default function Layout() {
 		<div className="w-screen h-screen bg-white flex items-center justify-center p-4 relative">
 			{/* Page Content */}
 			<div className="text-center w-full h-full flex items-center justify-center">
-				<Outlet />
+				<Routes>
+					{pages.map(page => (
+						<Route key={page.path} path={page.path} element={page.element} />
+					))}
+				</Routes>
 			</div>
 
 			{/* Navigation Menu - Show on hover */}
