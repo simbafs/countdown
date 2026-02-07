@@ -175,7 +175,7 @@ export default function WebSocketDebugPage() {
 							Export Logs ({logs.length})
 						</button>
 					</div>
-					
+
 					{/* Auto-scroll toggle */}
 					<div className="flex items-center space-x-2">
 						<label className="flex items-center text-sm text-gray-700 cursor-pointer">
@@ -195,7 +195,7 @@ export default function WebSocketDebugPage() {
 			</div>
 
 			{/* Logs Display */}
-			<div ref={logContainerRef} className="bg-gray-900 rounded-lg p-4 h-[32rem] overflow-auto">
+			<div ref={logContainerRef} className="bg-gray-900 rounded-lg p-4 h-128 overflow-auto">
 				{activeView === 'events' ? (
 					eventLogs.length === 0 ? (
 						<div className="text-gray-400 text-center py-8">
