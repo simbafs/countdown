@@ -48,7 +48,7 @@ interface Settings {
 	selectedTimer: 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3'
 }
 
-export default function TimerDisplay() {
+export default function Timer() {
 	const [timerData, setTimerData] = useState<TimerData | null>(null)
 	const [auxTimers, setAuxTimers] = useState<Record<string, AuxTimer | null | undefined>>({
 		auxtimer1: undefined,

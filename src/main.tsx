@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './components/Layout'
-import TimerDisplay from './pages/TimerDisplay'
+import Timer from './pages/Timer'
 import './style.css'
 
 const router = createBrowserRouter([
@@ -12,7 +12,7 @@ const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				element: <TimerDisplay />,
+				element: <Timer />,
 			},
 		],
 	},
