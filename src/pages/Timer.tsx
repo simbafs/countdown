@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import HoverMenu from '../components/HoverMenu'
 import { useDynamicTextSize } from '../hooks/useDynamicTextSize'
+import { useWebsocket } from '../hooks/useWebsocket'
 
 interface TimerData {
 	addedTime: number
@@ -19,17 +20,6 @@ interface AuxTimer {
 	current: number
 	playback: string
 	direction: string
-}
-
-interface WebSocketData {
-	tag: string
-	payload: {
-		timer: TimerData
-		auxtimer1?: AuxTimer
-		auxtimer2?: AuxTimer
-		auxtimer3?: AuxTimer
-		clock: number
-	}
 }
 
 interface TextShadow {
@@ -136,56 +126,27 @@ export default function Timer() {
 		containerRef: placeholderContainerRef,
 	})
 
-	const connect = () => {
-		if (wsRef.current) {
-			wsRef.current.close()
-		}
-
-		try {
-			const ws = new WebSocket(settings.websocketPath)
-			wsRef.current = ws
-
-			ws.onopen = () => {
-				console.log('Connected to WebSocket timer source')
-			}
-
-			ws.onmessage = event => {
-				try {
-					const data: WebSocketData = JSON.parse(event.data)
-
-					if (data.tag === 'runtime-data') {
-						if (data.payload.timer) {
-							setTimerData(data.payload.timer)
-						}
-						if (data.payload.auxtimer1) {
-							setAuxTimers(prev => ({ ...prev, auxtimer1: data.payload.auxtimer1 }))
-						}
-						if (data.payload.auxtimer2) {
-							setAuxTimers(prev => ({ ...prev, auxtimer2: data.payload.auxtimer2 }))
-						}
-						if (data.payload.auxtimer3) {
-							setAuxTimers(prev => ({ ...prev, auxtimer3: data.payload.auxtimer3 }))
-						}
-					}
-				} catch (error) {
-					console.error('Error parsing WebSocket message:', error)
+	useWebsocket(settings.websocketPath, (tag, payload) => {
+		switch (tag) {
+			case 'runtime-data':
+				if (payload.timer) {
+					setTimerData(payload.timer)
 				}
-			}
-
-			ws.onerror = error => {
-				console.error('WebSocket error:', error)
-			}
-
-			ws.onclose = () => {
-				console.log('WebSocket connection closed')
-				reconnectTimeoutRef.current = window.setTimeout(() => {
-					connect()
-				}, 3000)
-			}
-		} catch (error) {
-			console.error('Failed to create WebSocket connection:', error)
+				if (payload.auxtimer1) {
+					setAuxTimers(prev => ({ ...prev, auxtimer1: payload.auxtimer1 }))
+				}
+				if (payload.auxtimer2) {
+					setAuxTimers(prev => ({ ...prev, auxtimer2: payload.auxtimer2 }))
+				}
+				if (payload.auxtimer3) {
+					setAuxTimers(prev => ({ ...prev, auxtimer3: payload.auxtimer3 }))
+				}
+				break
+			default:
+				return false
 		}
-	}
+		return true
+	})
 
 	useEffect(() => {
 		const urlParams = new URLSearchParams(window.location.search)
@@ -228,20 +189,6 @@ export default function Timer() {
 		url.searchParams.set('selectedTimer', settings.selectedTimer)
 		window.history.replaceState({}, '', url.toString())
 	}, [settings])
-
-	useEffect(() => {
-		connect()
-
-		return () => {
-			if (reconnectTimeoutRef.current) {
-				clearTimeout(reconnectTimeoutRef.current)
-			}
-			if (wsRef.current) {
-				wsRef.current.close()
-				wsRef.current = null
-			}
-		}
-	}, [settings.websocketPath])
 
 	useEffect(() => {
 		return () => {
