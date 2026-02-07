@@ -71,8 +71,6 @@ export default function TimerDisplay() {
 	const [showSettingsButton, setShowSettingsButton] = useState(false)
 	const wsRef = useRef<WebSocket | null>(null)
 	const reconnectTimeoutRef = useRef<number | null>(null)
-
-	// Container refs for dynamic text sizing
 	const activeTimerContainerRef = useRef<HTMLDivElement>(null)
 	const placeholderContainerRef = useRef<HTMLDivElement>(null)
 
@@ -103,7 +101,6 @@ export default function TimerDisplay() {
 		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 	}
 
-	// Get the current timer data based on selection
 	const getCurrentTimerData = () => {
 		switch (settings.selectedTimer) {
 			case 'auxtimer1':
@@ -117,15 +114,11 @@ export default function TimerDisplay() {
 		}
 	}
 
-	// Convert timer data to display text
 	const getTimerText = (timer: TimerData | AuxTimer | null | undefined): string => {
 		if (!timer) return settings.showHours ? '--:--:--' : '--:--'
-
-		// For both main and aux timers, use the same formatTime function
 		return formatTime(timer.current)
 	}
 
-	// Dynamic text sizing for active timer
 	const currentTimerData = getCurrentTimerData()
 	const timerText = getTimerText(currentTimerData)
 	const { fontSize: activeFontSize, elementRef: activeTimerRef } = useDynamicTextSize({
@@ -135,7 +128,6 @@ export default function TimerDisplay() {
 		containerRef: activeTimerContainerRef,
 	})
 
-	// Dynamic text sizing for placeholder
 	const placeholderText = settings.showHours ? '--:--:--' : '--:--'
 	const { fontSize: placeholderFontSize, elementRef: placeholderRef } = useDynamicTextSize({
 		text: placeholderText,
@@ -165,7 +157,6 @@ export default function TimerDisplay() {
 						if (data.payload.timer) {
 							setTimerData(data.payload.timer)
 						}
-						// Handle auxiliary timers
 						if (data.payload.auxtimer1) {
 							setAuxTimers(prev => ({ ...prev, auxtimer1: data.payload.auxtimer1 }))
 						}
@@ -187,8 +178,6 @@ export default function TimerDisplay() {
 
 			ws.onclose = () => {
 				console.log('WebSocket connection closed')
-
-				// Attempt to reconnect after 3 seconds
 				reconnectTimeoutRef.current = window.setTimeout(() => {
 					connect()
 				}, 3000)
@@ -199,13 +188,10 @@ export default function TimerDisplay() {
 	}
 
 	useEffect(() => {
-		// Load settings from query string
 		const urlParams = new URLSearchParams(window.location.search)
 		const showHours = urlParams.get('showHours') === 'true'
 		const websocketPath = urlParams.get('websocketPath') || 'ws://localhost:4001/ws'
 		const roundingMode = (urlParams.get('roundingMode') as 'ceil' | 'floor' | 'round') || 'ceil'
-
-		// Load text shadow settings
 		const textShadowEnabled = urlParams.get('textShadowEnabled') === 'true'
 		const textShadowOffsetX = Number(urlParams.get('textShadowOffsetX')) || 2
 		const textShadowOffsetY = Number(urlParams.get('textShadowOffsetY')) || 2
@@ -230,7 +216,6 @@ export default function TimerDisplay() {
 	}, [])
 
 	useEffect(() => {
-		// Save settings to query string when they change
 		const url = new URL(window.location.href)
 		url.searchParams.set('showHours', settings.showHours.toString())
 		url.searchParams.set('websocketPath', settings.websocketPath)
@@ -258,7 +243,6 @@ export default function TimerDisplay() {
 		}
 	}, [settings.websocketPath])
 
-	// Cleanup on unmount
 	useEffect(() => {
 		return () => {
 			if (reconnectTimeoutRef.current) {
@@ -273,7 +257,7 @@ export default function TimerDisplay() {
 	}, [])
 
 	return (
-		<div className="w-screen h-screen bg-white flex items-center justify-center p-4 relative">
+		<div className="text-center w-full h-full overflow-hidden flex items-center justify-center relative">
 			{/* Settings Options - Show on hover */}
 			<div
 				className="absolute top-4 right-4"
@@ -472,53 +456,51 @@ export default function TimerDisplay() {
 			</div>
 
 			{/* Timer Display */}
-			<div className="text-center w-full h-full flex items-center justify-center">
-				{timerData ? (
+			{timerData ? (
+				<div
+					ref={activeTimerContainerRef}
+					className="text-black w-full h-full overflow-hidden flex items-center justify-center"
+				>
 					<div
-						ref={activeTimerContainerRef}
-						className="text-black w-full h-full overflow-hidden flex items-center justify-center"
+						ref={activeTimerRef}
+						className="font-mono font-bold tabular-nums leading-none whitespace-nowrap text-center"
+						style={{
+							fontSize: `${activeFontSize}px`,
+							width: '100%',
+							maxWidth: '100vw',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							textShadow: settings.textShadow.enabled
+								? `${settings.textShadow.offsetX}px ${settings.textShadow.offsetY}px ${settings.textShadow.blurRadius}px ${settings.textShadow.color}`
+								: 'none',
+						}}
 					>
-						<div
-							ref={activeTimerRef}
-							className="font-mono font-bold tabular-nums leading-none whitespace-nowrap text-center"
-							style={{
-								fontSize: `${activeFontSize}px`,
-								width: '100%',
-								maxWidth: '100vw',
-								overflow: 'hidden',
-								textOverflow: 'ellipsis',
-								textShadow: settings.textShadow.enabled
-									? `${settings.textShadow.offsetX}px ${settings.textShadow.offsetY}px ${settings.textShadow.blurRadius}px ${settings.textShadow.color}`
-									: 'none',
-							}}
-						>
-							{timerText}
-						</div>
+						{timerText}
 					</div>
-				) : (
+				</div>
+			) : (
+				<div
+					ref={placeholderContainerRef}
+					className="text-black w-full h-full overflow-hidden flex items-center justify-center"
+				>
 					<div
-						ref={placeholderContainerRef}
-						className="text-black w-full h-full overflow-hidden flex items-center justify-center"
+						ref={placeholderRef}
+						className="font-mono font-bold tabular-nums leading-none whitespace-nowrap text-center"
+						style={{
+							fontSize: `${placeholderFontSize}px`,
+							width: '100%',
+							maxWidth: '100vw',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							textShadow: settings.textShadow.enabled
+								? `${settings.textShadow.offsetX}px ${settings.textShadow.offsetY}px ${settings.textShadow.blurRadius}px ${settings.textShadow.color}`
+								: 'none',
+						}}
 					>
-						<div
-							ref={placeholderRef}
-							className="font-mono font-bold tabular-nums leading-none whitespace-nowrap text-center"
-							style={{
-								fontSize: `${placeholderFontSize}px`,
-								width: '100%',
-								maxWidth: '100vw',
-								overflow: 'hidden',
-								textOverflow: 'ellipsis',
-								textShadow: settings.textShadow.enabled
-									? `${settings.textShadow.offsetX}px ${settings.textShadow.offsetY}px ${settings.textShadow.blurRadius}px ${settings.textShadow.color}`
-									: 'none',
-							}}
-						>
-							{placeholderText}
-						</div>
+						{placeholderText}
 					</div>
-				)}
-			</div>
+				</div>
+			)}
 		</div>
 	)
 }

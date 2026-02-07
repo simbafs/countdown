@@ -18,7 +18,10 @@ This document contains development guidelines and commands for agentic coding ag
 
 ### Testing
 
-This project currently has no test suite configured. Tests should be added using a framework like Vitest or Jest.
+This project currently has no test suite configured. When adding tests, use Vitest for React testing:
+- Install: `pnpm add -D vitest @testing-library/react @testing-library/jest-dom jsdom`
+- Add to package.json: `"test": "vitest", "test:ui": "vitest --ui"`
+- Run single test: `pnpm test TimerDisplay.test.tsx`
 
 ## Code Style Guidelines
 
@@ -114,10 +117,12 @@ This project currently has no test suite configured. Tests should be added using
 
 ```
 src/
-├── main.tsx          # Application entry point
-├── style.css         # Global styles and Tailwind imports
-├── TimerDisplay.tsx  # Main timer component
-└── WebSocketTest.tsx # WebSocket testing utility
+├── main.tsx              # Application entry point
+├── style.css             # Global styles and Tailwind imports
+├── TimerDisplay.tsx      # Main timer component
+├── useDynamicTextSize.ts # Custom hook for dynamic text sizing
+├── WebSocketTest.tsx     # WebSocket testing utility
+└── counter.ts            # Counter utilities
 ```
 
 ## Development Workflow
@@ -135,3 +140,4 @@ src/
 - Settings are persisted in URL query parameters
 - No external API dependencies besides the WebSocket connection
 - Transparent background for overlay/overlay-style display usage
+- Uses vite-plugin-singlefile to create a single HTML output file
