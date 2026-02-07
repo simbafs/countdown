@@ -124,26 +124,23 @@ export default function Timer() {
 		containerRef: placeholderContainerRef,
 	})
 
-	useWebsocket(settings.websocketPath, (tag, payload) => {
-		switch (tag) {
-			case 'runtime-data':
-				if (payload.timer) {
-					setTimerData(payload.timer)
-				}
-				if (payload.auxtimer1) {
-					setAuxTimers(prev => ({ ...prev, auxtimer1: payload.auxtimer1 }))
-				}
-				if (payload.auxtimer2) {
-					setAuxTimers(prev => ({ ...prev, auxtimer2: payload.auxtimer2 }))
-				}
-				if (payload.auxtimer3) {
-					setAuxTimers(prev => ({ ...prev, auxtimer3: payload.auxtimer3 }))
-				}
-				break
+	useWebsocket(settings.websocketPath, (event, data) => {
+		switch (event) {
+			case 'timer':
+				setTimerData(data as TimerData)
+				return true
+			case 'auxtimer1':
+				setAuxTimers(prev => ({ ...prev, auxtimer1: data as AuxTimer }))
+				return true
+			case 'auxtimer2':
+				setAuxTimers(prev => ({ ...prev, auxtimer2: data as AuxTimer }))
+				return true
+			case 'auxtimer3':
+				setAuxTimers(prev => ({ ...prev, auxtimer3: data as AuxTimer }))
+				return true
 			default:
 				return false
 		}
-		return true
 	})
 
 	useEffect(() => {
