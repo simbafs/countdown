@@ -25,6 +25,5 @@
 		"react-use-websocket": "^4.13.0",
 		"tailwindcss": "^4.1.18",
 		"vite-plugin-singlefile": "^2.3.0"
-	},
-	"packageManager": "pnpm@10.12.4"
+	}
 }
