@@ -33,7 +33,6 @@ interface TextShadow {
 interface Settings {
 	showHours: boolean
 	websocketPath: string
-	roundingMode: 'ceil' | 'floor' | 'round'
 	textShadow: TextShadow
 	selectedTimer: 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3'
 }
@@ -48,7 +47,6 @@ export default function Timer() {
 	const [settings, setSettings] = useState<Settings>({
 		showHours: false,
 		websocketPath: 'ws://localhost:4001/ws',
-		roundingMode: 'ceil',
 		textShadow: {
 			enabled: false,
 			offsetX: 2,
@@ -63,30 +61,22 @@ export default function Timer() {
 	const placeholderContainerRef = useRef<HTMLDivElement>(null)
 
 	const formatTime = (milliseconds: number): string => {
-		let totalSeconds: number
-		switch (settings.roundingMode) {
-			case 'ceil':
-				totalSeconds = Math.ceil(milliseconds / 1000)
-				break
-			case 'floor':
-				totalSeconds = Math.floor(milliseconds / 1000)
-				break
-			case 'round':
-				totalSeconds = Math.round(milliseconds / 1000)
-				break
-			default:
-				totalSeconds = Math.ceil(milliseconds / 1000)
-		}
+		const totalSeconds = Math.ceil(milliseconds / 1000)
 
-		const hours = Math.floor(totalSeconds / 3600)
-		const minutes = Math.floor((totalSeconds % 3600) / 60)
-		const seconds = totalSeconds % 60
+		const isNegative = totalSeconds < 0
+		const absSeconds = Math.abs(totalSeconds)
+
+		const hours = Math.floor(absSeconds / 3600)
+		const minutes = Math.floor((absSeconds % 3600) / 60)
+		const seconds = absSeconds % 60
+
+		const sign = isNegative ? '-' : ''
 
 		if (settings.showHours) {
-			return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+			return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 		}
 
-		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+		return `${sign}${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 	}
 
 	const getCurrentTimerData = () => {
@@ -152,7 +142,6 @@ export default function Timer() {
 		const urlParams = new URLSearchParams(window.location.search)
 		const showHours = urlParams.get('showHours') === 'true'
 		const websocketPath = urlParams.get('websocketPath') || 'ws://localhost:4001/ws'
-		const roundingMode = (urlParams.get('roundingMode') as 'ceil' | 'floor' | 'round') || 'ceil'
 		const textShadowEnabled = urlParams.get('textShadowEnabled') === 'true'
 		const textShadowOffsetX = Number(urlParams.get('textShadowOffsetX')) || 2
 		const textShadowOffsetY = Number(urlParams.get('textShadowOffsetY')) || 2
@@ -164,7 +153,6 @@ export default function Timer() {
 		setSettings({
 			showHours,
 			websocketPath,
-			roundingMode,
 			textShadow: {
 				enabled: textShadowEnabled,
 				offsetX: textShadowOffsetX,
@@ -180,7 +168,6 @@ export default function Timer() {
 		const url = new URL(window.location.href)
 		url.searchParams.set('showHours', settings.showHours.toString())
 		url.searchParams.set('websocketPath', settings.websocketPath)
-		url.searchParams.set('roundingMode', settings.roundingMode)
 		url.searchParams.set('textShadowEnabled', settings.textShadow.enabled.toString())
 		url.searchParams.set('textShadowOffsetX', settings.textShadow.offsetX.toString())
 		url.searchParams.set('textShadowOffsetY', settings.textShadow.offsetY.toString())
@@ -210,24 +197,7 @@ export default function Timer() {
 						</label>
 					</div>
 
-					{/* Rounding Mode */}
-					<div className="mb-4">
-						<label className="block text-black text-sm font-medium mb-2">Rounding Mode</label>
-						<select
-							value={settings.roundingMode}
-							onChange={e =>
-								setSettings({
-									...settings,
-									roundingMode: e.target.value as 'ceil' | 'floor' | 'round',
-								})
-							}
-							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-						>
-							<option value="ceil">Ceil (Round Up)</option>
-							<option value="floor">Floor (Round Down)</option>
-							<option value="round">Round (Nearest)</option>
-						</select>
-					</div>
+
 
 					{/* WebSocket Path */}
 					<div className="mb-4">
