@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import HoverMenu from './HoverMenu'
 import Timer from '../pages/Timer'
 import WebSocketDebugPage from '../pages/WebSocketDebugPage'
+import Card from '../pages/Card'
 
 interface Page {
 	name: string
@@ -11,6 +12,7 @@ interface Page {
 
 export const pages: Page[] = [
 	{ name: 'Timer', path: '/', element: <Timer /> },
+	{ name: 'Card', path: '/card', element: <Card /> },
 	{ name: 'WebSocket Debug', path: '/debug', element: <WebSocketDebugPage /> },
 ]
 
