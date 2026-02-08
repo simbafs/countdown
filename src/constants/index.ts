@@ -12,11 +12,11 @@ export const TIMER_LABELS: Record<TimerName, string> = {
 }
 
 export const DEFAULT_TEXT_SHADOW = {
-	enabled: false,
-	offsetX: 2,
-	offsetY: 2,
-	blurRadius: 4,
-	color: '#000000',
+	enabled: true,
+	offsetX: 10,
+	offsetY: 10,
+	blurRadius: 20,
+	color: '#808080',
 }
 
 export const DEFAULT_TIMER_SETTINGS = {
