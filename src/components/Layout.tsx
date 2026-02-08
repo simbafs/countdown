@@ -20,7 +20,7 @@ export default function Layout() {
 	const location = useLocation()
 
 	return (
-		<div className="w-screen h-screen bg-white flex items-center justify-center p-4 relative">
+		<div className="w-screen h-screen flex items-center justify-center p-4 relative">
 			{/* Page Content */}
 			<div className="text-center w-full h-full flex items-center justify-center">
 				<Routes>
