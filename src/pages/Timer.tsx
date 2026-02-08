@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import HoverMenu from '../components/HoverMenu'
 import { useDynamicTextSize } from '../hooks/useDynamicTextSize'
+import { useSetting } from '../hooks/useSetting'
 import { useWebsocket } from '../hooks/useWebsocket'
 
 interface TimerData {
@@ -37,6 +38,19 @@ interface Settings {
 	selectedTimer: 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3'
 }
 
+const defaultSettings: Settings = {
+	showHours: true,
+	websocketPath: 'ws://localhost:4001/ws',
+	textShadow: {
+		enabled: false,
+		offsetX: 2,
+		offsetY: 2,
+		blurRadius: 4,
+		color: '#000000',
+	},
+	selectedTimer: 'main',
+}
+
 export default function Timer() {
 	const [timerData, setTimerData] = useState<TimerData | null>(null)
 	const [auxTimers, setAuxTimers] = useState<Record<string, AuxTimer | null | undefined>>({
@@ -44,18 +58,7 @@ export default function Timer() {
 		auxtimer2: undefined,
 		auxtimer3: undefined,
 	})
-	const [settings, setSettings] = useState<Settings>({
-		showHours: false,
-		websocketPath: 'ws://localhost:4001/ws',
-		textShadow: {
-			enabled: false,
-			offsetX: 2,
-			offsetY: 2,
-			blurRadius: 4,
-			color: '#000000',
-		},
-		selectedTimer: 'main',
-	})
+	const { setting: settings, setSetting } = useSetting<Settings>(defaultSettings)
 
 	const activeTimerContainerRef = useRef<HTMLDivElement>(null)
 	const placeholderContainerRef = useRef<HTMLDivElement>(null)
@@ -131,51 +134,12 @@ export default function Timer() {
 			default:
 				return false
 		}
-	}, [setTimerData, setAuxTimers])
+	}, [])
 
 	useWebsocket(settings.websocketPath, handler, {
 		ignoreOtherTags: true,
 		ignoreUnhandledEvents: true,
 	})
-
-	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search)
-		const showHours = urlParams.get('showHours') === 'true'
-		const websocketPath = urlParams.get('websocketPath') || 'ws://localhost:4001/ws'
-		const textShadowEnabled = urlParams.get('textShadowEnabled') === 'true'
-		const textShadowOffsetX = Number(urlParams.get('textShadowOffsetX')) || 2
-		const textShadowOffsetY = Number(urlParams.get('textShadowOffsetY')) || 2
-		const textShadowBlurRadius = Number(urlParams.get('textShadowBlurRadius')) || 4
-		const textShadowColor = urlParams.get('textShadowColor') || '#000000'
-		const selectedTimer =
-			(urlParams.get('selectedTimer') as 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3') || 'main'
-
-		setSettings({
-			showHours,
-			websocketPath,
-			textShadow: {
-				enabled: textShadowEnabled,
-				offsetX: textShadowOffsetX,
-				offsetY: textShadowOffsetY,
-				blurRadius: textShadowBlurRadius,
-				color: textShadowColor,
-			},
-			selectedTimer,
-		})
-	}, [])
-
-	useEffect(() => {
-		const url = new URL(window.location.href)
-		url.searchParams.set('showHours', settings.showHours.toString())
-		url.searchParams.set('websocketPath', settings.websocketPath)
-		url.searchParams.set('textShadowEnabled', settings.textShadow.enabled.toString())
-		url.searchParams.set('textShadowOffsetX', settings.textShadow.offsetX.toString())
-		url.searchParams.set('textShadowOffsetY', settings.textShadow.offsetY.toString())
-		url.searchParams.set('textShadowBlurRadius', settings.textShadow.blurRadius.toString())
-		url.searchParams.set('textShadowColor', settings.textShadow.color)
-		url.searchParams.set('selectedTimer', settings.selectedTimer)
-		window.history.replaceState({}, '', url.toString())
-	}, [settings])
 
 	return (
 		<div className="text-center w-full h-full overflow-hidden flex items-center justify-center relative">
@@ -190,14 +154,12 @@ export default function Timer() {
 							<input
 								type="checkbox"
 								checked={settings.showHours}
-								onChange={e => setSettings({ ...settings, showHours: e.target.checked })}
+								onChange={e => setSetting({ showHours: e.target.checked })}
 								className="mr-3 w-4 h-4"
 							/>
 							<span>Show Hours</span>
 						</label>
 					</div>
-
-
 
 					{/* WebSocket Path */}
 					<div className="mb-4">
@@ -205,7 +167,7 @@ export default function Timer() {
 						<input
 							type="text"
 							value={settings.websocketPath}
-							onChange={e => setSettings({ ...settings, websocketPath: e.target.value })}
+							onChange={e => setSetting({ websocketPath: e.target.value })}
 							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 							placeholder="ws://localhost:4001/ws"
 						/>
@@ -217,12 +179,7 @@ export default function Timer() {
 							<input
 								type="checkbox"
 								checked={settings.textShadow.enabled}
-								onChange={e =>
-									setSettings({
-										...settings,
-										textShadow: { ...settings.textShadow, enabled: e.target.checked },
-									})
-								}
+								onChange={e => setSetting({ textShadow: { ...settings.textShadow, enabled: e.target.checked } })}
 								className="mr-3 w-4 h-4"
 							/>
 							<span>Text Shadow</span>
@@ -236,12 +193,7 @@ export default function Timer() {
 									<input
 										type="color"
 										value={settings.textShadow.color}
-										onChange={e =>
-											setSettings({
-												...settings,
-												textShadow: { ...settings.textShadow, color: e.target.value },
-											})
-										}
+										onChange={e => setSetting({ textShadow: { ...settings.textShadow, color: e.target.value } })}
 										className="w-full h-8 border border-gray-300 rounded cursor-pointer"
 									/>
 								</div>
@@ -256,15 +208,7 @@ export default function Timer() {
 										min="-20"
 										max="20"
 										value={settings.textShadow.offsetX}
-										onChange={e =>
-											setSettings({
-												...settings,
-												textShadow: {
-													...settings.textShadow,
-													offsetX: Number(e.target.value),
-												},
-											})
-										}
+										onChange={e => setSetting({ textShadow: { ...settings.textShadow, offsetX: Number(e.target.value) } })}
 										className="w-full"
 									/>
 								</div>
@@ -279,15 +223,7 @@ export default function Timer() {
 										min="-20"
 										max="20"
 										value={settings.textShadow.offsetY}
-										onChange={e =>
-											setSettings({
-												...settings,
-												textShadow: {
-													...settings.textShadow,
-													offsetY: Number(e.target.value),
-												},
-											})
-										}
+										onChange={e => setSetting({ textShadow: { ...settings.textShadow, offsetY: Number(e.target.value) } })}
 										className="w-full"
 									/>
 								</div>
@@ -302,15 +238,7 @@ export default function Timer() {
 										min="0"
 										max="20"
 										value={settings.textShadow.blurRadius}
-										onChange={e =>
-											setSettings({
-												...settings,
-												textShadow: {
-													...settings.textShadow,
-													blurRadius: Number(e.target.value),
-												},
-											})
-										}
+										onChange={e => setSetting({ textShadow: { ...settings.textShadow, blurRadius: Number(e.target.value) } })}
 										className="w-full"
 									/>
 								</div>
@@ -323,12 +251,7 @@ export default function Timer() {
 						<label className="block text-black text-sm font-medium mb-2">Timer Selection</label>
 						<select
 							value={settings.selectedTimer}
-							onChange={e =>
-								setSettings({
-									...settings,
-									selectedTimer: e.target.value as 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3',
-								})
-							}
+							onChange={e => setSetting({ selectedTimer: e.target.value as 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3' })}
 							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 						>
 							<option value="main">Main Timer</option>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useWebsocket } from '../hooks/useWebsocket'
 
 interface EventData {
@@ -32,6 +32,13 @@ interface EventData {
 }
 
 export default function Card() {
+	useEffect(() => {
+		// clear search parameters
+		const url = new URL(window.location.href)
+		url.search = ''
+		window.history.replaceState({}, '', url.toString())
+	}, [])
+
 	const [eventData, setEventData] = useState<EventData | null>(null)
 
 	const formatTime = (milliseconds: number): string => {
