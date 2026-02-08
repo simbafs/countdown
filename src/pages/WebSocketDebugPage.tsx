@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { MAX_LOGS } from '../constants'
 import { useWebsocket } from '../hooks/useWebsocket'
+import type { LogEntry } from '../types'
 
-interface LogEntry {
-	timestamp: string
-	type: 'tag' | 'event'
-	name: string
-	data: any
+interface LogTableProps {
+	logs: LogEntry[]
+	columnHeader: string
 }
 
-function LogTable({ logs, columnHeader }: { logs: LogEntry[]; columnHeader: string }) {
+function LogTable({ logs, columnHeader }: LogTableProps) {
 	return (
 		<table className="w-full text-sm font-mono">
 			<thead className="sticky top-0 bg-gray-800 border-b border-gray-700">
@@ -22,9 +22,7 @@ function LogTable({ logs, columnHeader }: { logs: LogEntry[]; columnHeader: stri
 				{logs.map((log, index) => (
 					<tr key={index} className="border-b border-gray-800 hover:bg-gray-800">
 						<td className="px-4 py-2 text-gray-400 whitespace-nowrap">{log.timestamp}</td>
-						<td className="px-4 py-2 text-cyan-300 whitespace-nowrap font-medium">
-							{log.name}
-						</td>
+						<td className="px-4 py-2 text-cyan-300 whitespace-nowrap font-medium">{log.name}</td>
 						<td className="px-4 py-2">
 							<pre className="text-gray-300 text-xs overflow-x-auto whitespace-pre-wrap max-w-md text-left">
 								{JSON.stringify(log.data, null, 2)}
@@ -43,37 +41,32 @@ export default function WebSocketDebugPage() {
 	const [isConnected, setIsConnected] = useState(false)
 	const [activeView, setActiveView] = useState<'events' | 'tags'>('events')
 	const [autoScroll, setAutoScroll] = useState(true)
-	const maxLogs = 200
 	const logContainerRef = useRef<HTMLDivElement>(null)
 
-	const addLog = useCallback((type: 'tag' | 'event', name: string, data: any) => {
+	const addLog = useCallback((type: LogEntry['type'], name: string, data: unknown) => {
 		const timestamp = new Date().toLocaleTimeString()
 		setLogs(prev => {
 			const newLogs = [...prev, { timestamp, type, name, data }]
-			// Keep only the last maxLogs entries
-			if (newLogs.length > maxLogs) {
-				return newLogs.slice(-maxLogs)
-			}
-			return newLogs
+			return newLogs.length > MAX_LOGS ? newLogs.slice(-MAX_LOGS) : newLogs
 		})
-	}, [maxLogs])
+	}, [])
 
-	const handler = useCallback((_event: string, _data: any) => {
+	const handler = useCallback(() => {
 		// We don't need to handle events here since we're using onMessage callback
 		return false
 	}, [])
 
-	const onMessage = useCallback((tag: string, payload: any) => {
-		addLog('tag', tag, payload)
-		if (tag === 'runtime-data') {
-			for (const [event, data] of Object.entries(payload)) {
-				addLog('event', event, data)
+	const onMessage = useCallback(
+		(tag: string, payload: Record<string, unknown>) => {
+			addLog('tag', tag, payload)
+			if (tag === 'runtime-data') {
+				for (const [event, data] of Object.entries(payload)) {
+					addLog('event', event, data)
+				}
 			}
-		}
-	}, [addLog])
-
-	const eventLogs = logs.filter(log => log.type === 'event')
-	const tagLogs = logs.filter(log => log.type === 'tag')
+		},
+		[addLog],
+	)
 
 	const { readyState } = useWebsocket(websocketPath, handler, {
 		ignoreOtherTags: true,
@@ -85,16 +78,16 @@ export default function WebSocketDebugPage() {
 		setIsConnected(readyState === 1) // WebSocket.OPEN = 1
 	}, [readyState])
 
-	// Auto-scroll to bottom when new logs are added
 	useEffect(() => {
 		if (autoScroll && logContainerRef.current) {
 			logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight
 		}
 	}, [logs, autoScroll])
 
-	const clearLogs = () => {
-		setLogs([])
-	}
+	const eventLogs = logs.filter(log => log.type === 'event')
+	const tagLogs = logs.filter(log => log.type === 'tag')
+
+	const clearLogs = () => setLogs([])
 
 	const exportLogs = () => {
 		const logData = JSON.stringify(logs, null, 2)
@@ -139,19 +132,21 @@ export default function WebSocketDebugPage() {
 					<div className="flex bg-gray-100 rounded-lg p-1">
 						<button
 							onClick={() => setActiveView('events')}
-							className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeView === 'events'
-								? 'bg-white text-blue-600 shadow-sm'
-								: 'text-gray-600 hover:text-gray-800'
-								}`}
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+								activeView === 'events'
+									? 'bg-white text-blue-600 shadow-sm'
+									: 'text-gray-600 hover:text-gray-800'
+							}`}
 						>
 							Events ({eventLogs.length})
 						</button>
 						<button
 							onClick={() => setActiveView('tags')}
-							className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeView === 'tags'
-								? 'bg-white text-blue-600 shadow-sm'
-								: 'text-gray-600 hover:text-gray-800'
-								}`}
+							className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+								activeView === 'tags'
+									? 'bg-white text-blue-600 shadow-sm'
+									: 'text-gray-600 hover:text-gray-800'
+							}`}
 						>
 							Tags ({tagLogs.length})
 						</button>
@@ -187,9 +182,7 @@ export default function WebSocketDebugPage() {
 							/>
 							<span>Auto-scroll</span>
 						</label>
-						<span className="text-xs text-gray-500">
-							(Max {maxLogs} logs)
-						</span>
+						<span className="text-xs text-gray-500">(Max {MAX_LOGS} logs)</span>
 					</div>
 				</div>
 			</div>
@@ -204,14 +197,12 @@ export default function WebSocketDebugPage() {
 					) : (
 						<LogTable logs={eventLogs} columnHeader="Event" />
 					)
+				) : tagLogs.length === 0 ? (
+					<div className="text-gray-400 text-center py-8">
+						No tags yet. Connect to a WebSocket source to see top-level message tags.
+					</div>
 				) : (
-					tagLogs.length === 0 ? (
-						<div className="text-gray-400 text-center py-8">
-							No tags yet. Connect to a WebSocket source to see top-level message tags.
-						</div>
-					) : (
-						<LogTable logs={tagLogs} columnHeader="Tag" />
-					)
+					<LogTable logs={tagLogs} columnHeader="Tag" />
 				)}
 			</div>
 		</div>

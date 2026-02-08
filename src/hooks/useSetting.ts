@@ -1,91 +1,124 @@
-import { getProperty, setProperty } from "dot-prop";
-import { useEffect, useState } from "react";
+import { getProperty, setProperty } from 'dot-prop'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-// Helper function to get all paths with dot notation from an object
-function getAllPaths(obj: Record<string, any>, prefix = ''): string[] {
-    const paths: string[] = [];
-    
-    for (const key of Object.keys(obj)) {
-        const newPath = prefix ? `${prefix}.${key}` : key;
-        const value = obj[key];
-        
-        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            paths.push(...getAllPaths(value, newPath));
-        } else {
-            paths.push(newPath);
-        }
-    }
-    
-    return paths;
+type PlainObject = Record<string, unknown>
+
+function getAllPaths(obj: PlainObject, prefix = ''): string[] {
+	const paths: string[] = []
+
+	for (const key of Object.keys(obj)) {
+		const newPath = prefix ? `${prefix}.${key}` : key
+		const value = obj[key]
+
+		if (isPlainObject(value)) {
+			paths.push(...getAllPaths(value as PlainObject, newPath))
+		} else {
+			paths.push(newPath)
+		}
+	}
+
+	return paths
 }
 
-// useSetting is a custom hook that manages a settings object which will be saved to search parameter. It only saved options that are different from the default value, and it will automatically load the settings from search parameter when the component is mounted. It also provides a function to update the settings and save it to search parameter.
-export function useSetting<T extends Record<string, any>>(defaultValue: T) {
-    const [setting, setSetting] = useState<T>(defaultValue);
+function isPlainObject(value: unknown): value is PlainObject {
+	return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
-    // Load settings from URL search parameters on mount
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const defaultPaths = getAllPaths(defaultValue);
-        let loadedSettings: Partial<T> = {};
-        
-        for (const path of defaultPaths) {
-            const value = urlParams.get(path);
-            if (value !== null) {
-                try {
-                    // Try to parse as JSON for complex types
-                    const parsedValue = JSON.parse(value);
-                    loadedSettings = setProperty(loadedSettings, path, parsedValue) as Partial<T>;
-                } catch {
-                    // If parsing fails, use the string value directly
-                    loadedSettings = setProperty(loadedSettings, path, value) as Partial<T>;
-                }
-            }
-        }
-        
-        if (Object.keys(loadedSettings).length > 0) {
-            setSetting(prev => ({ ...prev, ...loadedSettings }));
-        }
-    }, []);
+function serializeValue(value: unknown): string {
+	return JSON.stringify(value)
+}
 
-    // Save settings to URL search parameters whenever they change
-    useEffect(() => {
-        const url = new URL(window.location.href);
-        const defaultPaths = getAllPaths(defaultValue);
-        
-        for (const path of defaultPaths) {
-            const currentValue = getProperty(setting, path);
-            const defaultPathValue = getProperty(defaultValue, path);
-            
-            // Only save if different from default
-            if (JSON.stringify(currentValue) !== JSON.stringify(defaultPathValue)) {
-                url.searchParams.set(path, JSON.stringify(currentValue));
-            } else {
-                url.searchParams.delete(path);
-            }
-        }
-        
-        window.history.replaceState({}, '', url.toString());
-    }, [setting]);
+function deserializeValue(value: string): unknown {
+	try {
+		return JSON.parse(value)
+	} catch {
+		return value
+	}
+}
 
-    // Function to update settings (supports both flat and nested updates)
-    const updateSetting = (updates: Partial<T> | Record<string, any>) => {
-        setSetting(prev => {
-            let result = { ...prev };
-            
-            for (const [key, value] of Object.entries(updates)) {
-                if (key.includes('.')) {
-                    // Handle dot notation updates
-                    result = setProperty(result, key, value) as T;
-                } else {
-                    // Handle regular updates
-                    result[key as keyof T] = value;
-                }
-            }
-            
-            return result;
-        });
-    };
+interface UseSettingReturn<T> {
+	setting: T
+	setSetting: (updates: Partial<T>) => void
+	resetToDefaults: () => void
+	isLoaded: boolean
+}
 
-    return { setting, setSetting: updateSetting };
+export function useSetting<T extends PlainObject>(defaultValue: T): UseSettingReturn<T> {
+	const [setting, setSettingState] = useState<T>(defaultValue)
+	const [isLoaded, setIsLoaded] = useState(false)
+	const defaultValueRef = useRef(defaultValue)
+
+	// Load settings from URL on mount
+	useEffect(() => {
+		const urlParams = new URLSearchParams(window.location.search)
+		const defaultPaths = getAllPaths(defaultValueRef.current)
+		const loadedSettings: Partial<T> = {}
+		let hasChanges = false
+
+		for (const path of defaultPaths) {
+			const value = urlParams.get(path)
+			if (value !== null) {
+				const deserialized = deserializeValue(value)
+				Object.assign(loadedSettings, setProperty(loadedSettings, path, deserialized))
+				hasChanges = true
+			}
+		}
+
+		if (hasChanges) {
+			setSettingState(prev => ({ ...prev, ...loadedSettings }))
+		}
+		setIsLoaded(true)
+	}, [])
+
+	// Save settings to URL whenever they change
+	useEffect(() => {
+		if (!isLoaded) return
+
+		const url = new URL(window.location.href)
+		const defaultPaths = getAllPaths(defaultValueRef.current)
+
+		for (const path of defaultPaths) {
+			const currentValue = getProperty(setting, path)
+			const defaultValue = getProperty(defaultValueRef.current, path)
+
+			if (JSON.stringify(currentValue) !== JSON.stringify(defaultValue)) {
+				url.searchParams.set(path, serializeValue(currentValue))
+			} else {
+				url.searchParams.delete(path)
+			}
+		}
+
+		window.history.replaceState({}, '', url.toString())
+	}, [setting, isLoaded])
+
+	const setSetting = useCallback((updates: Partial<T>) => {
+		setSettingState(prev => {
+			const result = { ...prev }
+
+			for (const [key, value] of Object.entries(updates)) {
+				if (key.includes('.')) {
+					Object.assign(result, setProperty(result, key, value))
+				} else {
+					;(result as PlainObject)[key] = value
+				}
+			}
+
+			return result
+		})
+	}, [])
+
+	const resetToDefaults = useCallback(() => {
+		setSettingState(defaultValueRef.current)
+	}, [])
+
+	return { setting, setSetting, resetToDefaults, isLoaded }
+}
+
+export function useClearSreachParams() {
+	useEffect(() => {
+		// Clear search parameters when entering card view
+		const url = new URL(window.location.href)
+		url.search = ''
+		window.history.replaceState({}, '', url.toString())
+	}, [])
 }

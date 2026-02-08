@@ -1,8 +1,8 @@
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import HoverMenu from './HoverMenu'
+import { Link, Route, Routes, useLocation } from 'react-router-dom'
+import Card from '../pages/Card'
 import Timer from '../pages/Timer'
 import WebSocketDebugPage from '../pages/WebSocketDebugPage'
-import Card from '../pages/Card'
+import HoverMenu from './HoverMenu'
 
 interface Page {
 	name: string
@@ -39,10 +39,11 @@ export default function Layout() {
 							<Link
 								key={page.path}
 								to={page.path}
-								className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${location.pathname === page.path
-									? 'bg-blue-100 text-blue-700'
-									: 'text-gray-700 hover:bg-gray-100'
-									}`}
+								className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${
+									location.pathname === page.path
+										? 'bg-blue-100 text-blue-700'
+										: 'text-gray-700 hover:bg-gray-100'
+								}`}
 							>
 								<span>{page.name}</span>
 							</Link>

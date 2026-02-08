@@ -2,7 +2,7 @@
 
 A real-time display application for SITCON 2026 that connects to WebSocket sources and shows timer data and event information.
 
-**AI-Generated Project**: This project was primarily developed using AI assistance with [opencode](https://opencode.ai/) - an interactive CLI tool for software engineering. 
+**AI-Generated Project**: This project was primarily developed using AI assistance with [opencode](https://opencode.ai/) - an interactive CLI tool for software engineering.
 
 ## WebSocket Data Source
 
@@ -11,6 +11,7 @@ Connects to: `ws://localhost:4001/ws`
 **Backend**: This application connects to [OnTime](https://www.getontime.no/) - a professional scheduling and timer management system commonly used for live events, broadcasting, and conference management. OnTime provides real-time timer data and event information via WebSocket connections.
 
 ### Timer Data Format
+
 ```json
 {
 	"tag": "runtime-data",
@@ -32,6 +33,7 @@ Connects to: `ws://localhost:4001/ws`
 ```
 
 ### Event Data Format
+
 ```json
 {
 	"id": "60a5ee",
@@ -108,24 +110,27 @@ pnpm run preview
 1. Start the application: `pnpm run dev`
 2. Open http://localhost:5173 (or the port shown)
 3. Navigate between pages:
-   - **Timer** (`/`) - Main timer display with customizable settings
-   - **Card** (`/card`) - Event information display
-   - **WebSocket Debug** (`/debug`) - Debug interface for WebSocket events
+    - **Timer** (`/`) - Main timer display with customizable settings
+    - **Card** (`/card`) - Event information display
+    - **WebSocket Debug** (`/debug`) - Debug interface for WebSocket events
 
 ## Pages
 
 ### Timer Display (`/`)
+
 - Real-time timer display with dynamic text sizing
 - Support for main and auxiliary timers
 - Customizable text shadows and display options
 - Settings accessible via hover menu
 
 ### Event Card (`/card`)
+
 - Displays event information from `eventNext` WebSocket events
 - Shows title, time range (hh:mm - hh:mm), and speaker
 - Left-aligned layout with gradient styling
 
 ### WebSocket Debug (`/debug`)
+
 - Real-time WebSocket event monitoring
 - Event and tag filtering
 - Export functionality for debugging
