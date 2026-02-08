@@ -4,25 +4,6 @@ import { useDynamicTextSize } from '../hooks/useDynamicTextSize'
 import { useSetting } from '../hooks/useSetting'
 import { useWebsocket } from '../hooks/useWebsocket'
 
-interface TimerData {
-	addedTime: number
-	current: number
-	duration: number
-	elapsed: number
-	expectedFinish: number
-	phase: string
-	playback: string
-	secondaryTimer: null
-	startedAt: number
-}
-
-interface AuxTimer {
-	duration: number
-	current: number
-	playback: string
-	direction: string
-}
-
 interface TextShadow {
 	offsetX: number
 	offsetY: number
@@ -31,11 +12,13 @@ interface TextShadow {
 	enabled: boolean
 }
 
+type TimerNames = 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3'
+
 interface Settings {
 	showHours: boolean
 	websocketPath: string
 	textShadow: TextShadow
-	selectedTimer: 'main' | 'auxtimer1' | 'auxtimer2' | 'auxtimer3'
+	selectedTimer: TimerNames
 }
 
 const defaultSettings: Settings = {
@@ -52,8 +35,8 @@ const defaultSettings: Settings = {
 }
 
 export default function Timer() {
-	const [timerData, setTimerData] = useState<TimerData | null>(null)
-	const [auxTimers, setAuxTimers] = useState<Record<string, AuxTimer | null | undefined>>({
+	const [timers, setTimers] = useState<Record<TimerNames, number | undefined>>({
+		main: undefined,
 		auxtimer1: undefined,
 		auxtimer2: undefined,
 		auxtimer3: undefined,
@@ -82,26 +65,13 @@ export default function Timer() {
 		return `${sign}${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 	}
 
-	const getCurrentTimerData = () => {
-		switch (settings.selectedTimer) {
-			case 'auxtimer1':
-				return auxTimers.auxtimer1
-			case 'auxtimer2':
-				return auxTimers.auxtimer2
-			case 'auxtimer3':
-				return auxTimers.auxtimer3
-			default:
-				return timerData
-		}
+	const getTimerText = (current: number | undefined): string => {
+		if (current === undefined) return settings.showHours ? '--:--:--' : '--:--'
+		return formatTime(current)
 	}
 
-	const getTimerText = (timer: TimerData | AuxTimer | null | undefined): string => {
-		if (!timer) return settings.showHours ? '--:--:--' : '--:--'
-		return formatTime(timer.current)
-	}
-
-	const currentTimerData = getCurrentTimerData()
-	const timerText = getTimerText(currentTimerData)
+	const currentTimerValue = timers[settings.selectedTimer]
+	const timerText = getTimerText(currentTimerValue)
 	const { fontSize: activeFontSize, elementRef: activeTimerRef } = useDynamicTextSize({
 		text: timerText,
 		minFontSize: 10,
@@ -120,16 +90,16 @@ export default function Timer() {
 	const handler = useCallback((event: string, data: any) => {
 		switch (event) {
 			case 'timer':
-				setTimerData(data as TimerData)
+				setTimers(prev => ({ ...prev, main: data.current }))
 				return true
 			case 'auxtimer1':
-				setAuxTimers(prev => ({ ...prev, auxtimer1: data as AuxTimer }))
+				setTimers(prev => ({ ...prev, auxtimer1: data.current }))
 				return true
 			case 'auxtimer2':
-				setAuxTimers(prev => ({ ...prev, auxtimer2: data as AuxTimer }))
+				setTimers(prev => ({ ...prev, auxtimer2: data.current }))
 				return true
 			case 'auxtimer3':
-				setAuxTimers(prev => ({ ...prev, auxtimer3: data as AuxTimer }))
+				setTimers(prev => ({ ...prev, auxtimer3: data.current }))
 				return true
 			default:
 				return false
@@ -267,7 +237,7 @@ export default function Timer() {
 			</HoverMenu>
 
 			{/* Timer Display */}
-			{timerData ? (
+			{currentTimerValue !== undefined ? (
 				<div
 					ref={activeTimerContainerRef}
 					className="text-black w-full h-full overflow-hidden flex items-center justify-center"
