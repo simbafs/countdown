@@ -11,7 +11,7 @@ export default function Card() {
 	const [eventData, setEventData] = useState<EventData | null>(null)
 
 	const handler = useCallback((event: string, data: unknown) => {
-		if (event === 'eventNext') {
+		if (event === 'eventNow') {
 			setEventData(data as EventData)
 			return true
 		}
