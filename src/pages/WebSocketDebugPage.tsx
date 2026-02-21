@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MAX_LOGS } from '../constants'
-import { useWebsocket } from '../hooks/useWebsocket'
+import { useWebSocketContext } from '../components/WebSocketProvider'
 import type { LogEntry } from '../types'
 
 interface LogTableProps {
@@ -68,11 +68,19 @@ export default function WebSocketDebugPage() {
 		[addLog],
 	)
 
-	const { readyState } = useWebsocket(websocketPath, handler, {
-		ignoreOtherTags: true,
-		ignoreUnhandledEvents: true,
-		onMessage,
-	})
+	const { registerHandler, unregisterHandler, readyState } = useWebSocketContext()
+
+	useEffect(() => {
+		registerHandler(websocketPath, handler, {
+			ignoreOtherTags: true,
+			ignoreUnhandledEvents: true,
+			onMessage,
+		})
+
+		return () => {
+			unregisterHandler()
+		}
+	}, [websocketPath, handler, onMessage, registerHandler, unregisterHandler])
 
 	useEffect(() => {
 		setIsConnected(readyState === 1) // WebSocket.OPEN = 1

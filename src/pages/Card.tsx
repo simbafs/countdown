@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DEFAULT_WEBSOCKET_PATH } from '../constants'
 import { useClearSreachParams } from '../hooks/useSetting'
-import { useWebsocket } from '../hooks/useWebsocket'
+import { useWebSocketContext } from '../components/WebSocketProvider'
 import type { EventData } from '../types'
 import { formatEventTime } from '../utils/time'
 
@@ -18,10 +18,18 @@ export default function Card() {
 		return false
 	}, [])
 
-	useWebsocket(DEFAULT_WEBSOCKET_PATH, handler, {
-		ignoreOtherTags: true,
-		ignoreUnhandledEvents: true,
-	})
+	const { registerHandler, unregisterHandler } = useWebSocketContext()
+
+	useEffect(() => {
+		registerHandler(DEFAULT_WEBSOCKET_PATH, handler, {
+			ignoreOtherTags: true,
+			ignoreUnhandledEvents: true,
+		})
+
+		return () => {
+			unregisterHandler()
+		}
+	}, [handler, registerHandler, unregisterHandler])
 
 	if (!eventData) {
 		return (

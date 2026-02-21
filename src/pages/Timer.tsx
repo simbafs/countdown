@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import HoverMenu from '../components/HoverMenu'
 import { SettingsPanel } from '../components/SettingsPanel'
 import { TimerDisplay } from '../components/TimerDisplay'
 import { DEFAULT_TIMER_SETTINGS } from '../constants'
 import { useSetting } from '../hooks/useSetting'
-import { useWebsocket } from '../hooks/useWebsocket'
+import { useWebSocketContext } from '../components/WebSocketProvider'
 import type { TimerName, TimersMap } from '../types'
 import { formatTime, getTimerPlaceholder } from '../utils/time'
 
@@ -58,10 +58,18 @@ export default function Timer() {
 		}
 	}, [])
 
-	useWebsocket(settings.websocketPath, handler, {
-		ignoreOtherTags: true,
-		ignoreUnhandledEvents: true,
-	})
+	const { registerHandler, unregisterHandler } = useWebSocketContext()
+
+	useEffect(() => {
+		registerHandler(settings.websocketPath, handler, {
+			ignoreOtherTags: true,
+			ignoreUnhandledEvents: true,
+		})
+
+		return () => {
+			unregisterHandler()
+		}
+	}, [settings.websocketPath, handler, registerHandler, unregisterHandler])
 
 	return (
 		<div className="text-center w-full h-full overflow-hidden flex items-center justify-center relative">
