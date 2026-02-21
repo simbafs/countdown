@@ -18,6 +18,7 @@ export function TimerDisplay({ text, textShadow }: TimerDisplayProps) {
 		? `${textShadow.offsetX}px ${textShadow.offsetY}px ${textShadow.blurRadius}px ${textShadow.color}`
 		: 'none'
 
+	// BUG: the shadow will overflow
 	return (
 		<div ref={containerRef} className="text-black w-full h-full overflow-hidden flex items-center justify-center">
 			<div

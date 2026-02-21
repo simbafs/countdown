@@ -20,15 +20,13 @@ export default function Layout() {
 	const location = useLocation()
 
 	return (
-		<div className="w-screen h-screen flex items-center justify-center p-4 relative">
+		<div className="w-screen h-screen relative">
 			{/* Page Content */}
-			<div className="text-center w-full h-full flex items-center justify-center">
-				<Routes>
-					{pages.map(page => (
-						<Route key={page.path} path={page.path} element={page.element} />
-					))}
-				</Routes>
-			</div>
+			<Routes>
+				{pages.map(page => (
+					<Route key={page.path} path={page.path} element={page.element} />
+				))}
+			</Routes>
 
 			{/* Navigation Menu - Show on hover */}
 			<HoverMenu position="top-left">
