@@ -11,3 +11,7 @@
 		background: transparent;
 	}
 }
+
+@theme {
+	--font-inter: 'Inter', sans-serif;
+}

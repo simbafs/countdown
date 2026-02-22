@@ -1,5 +1,5 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
-import Card from '../pages/Card'
+import Card from '../pages/card/Card'
 import Timer from '../pages/Timer'
 import WebSocketDebugPage from '../pages/WebSocketDebugPage'
 import HoverMenu from './HoverMenu'
