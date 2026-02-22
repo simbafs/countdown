@@ -120,7 +120,10 @@ export default function Card() {
 						<div className="w-full flex flex-col items-start mb-[42px]">
 							<img src={slidoIconImg} width={152} />
 
-							<div className="text-[#F4EDE2] text-[36px] font-bold tracking-wide " style={{ filter: 'drop-shadow(4px 4px 3px #0000008C)' }}>
+							<div
+								className="text-[#F4EDE2] text-[36px] font-bold tracking-wide "
+								style={{ filter: 'drop-shadow(4px 4px 3px #0000008C)' }}
+							>
 								#{eventData.custom.slidoID}
 							</div>
 						</div>
@@ -135,9 +138,17 @@ export default function Card() {
 								<img src={slideImg} width={90} />
 							</div>
 							{/* 圖片區域留空，可依需求放入 img */}
-							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center" style={{ boxShadow: '4px 4px 3px 0px #6C410399' }}>
+							<div
+								className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center"
+								style={{ boxShadow: '4px 4px 3px 0px #6C410399' }}
+							>
 								{eventData.custom.slideURL && (
-									<QRCode value={eventData.custom.slideURL} size={160} bgColor="transparent" />
+									<QRCode
+										value={eventData.custom.slideURL}
+										size={160}
+										bgColor="transparent"
+										fgColor="#5C3D0E"
+									/>
 								)}
 							</div>
 						</div>
@@ -149,9 +160,17 @@ export default function Card() {
 								<img src={hackImg} width={90} />
 							</div>
 
-							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center" style={{ boxShadow: '4px 4px 3px 0px #6C410399' }}>
+							<div
+								className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center"
+								style={{ boxShadow: '4px 4px 3px 0px #6C410399' }}
+							>
 								{eventData.custom.hackmdURL && (
-									<QRCode value={eventData.custom.hackmdURL} size={160} bgColor="transparent" />
+									<QRCode
+										value={eventData.custom.hackmdURL}
+										size={160}
+										bgColor="transparent"
+										fgColor="#5C3D0E"
+									/>
 								)}
 							</div>
 						</div>
