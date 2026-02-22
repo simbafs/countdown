@@ -5,6 +5,7 @@ import { useSetting } from '../../hooks/useSetting'
 import type { EventData } from '../../types'
 import { formatEventTime } from '../../utils/time'
 
+import QRCode from 'react-qr-code'
 import { cn } from '../../utils/cn'
 import demoBGImg from './demo-bg.png'
 import hackIconImg from './hack-icon.png'
@@ -130,25 +131,25 @@ export default function Card() {
 					<div className="w-full grid grid-cols-2 gap-[18px]">
 						{/* 簡報項目 */}
 						<div className="flex flex-col gap-2">
-							<div className="flex items-center gap-2">
+							<div className="flex items-center gap-2 ml-[18px]">
 								<img src={slideIconImg} width={60} />
 								<img src={slideImg} width={90} />
 							</div>
 							{/* 圖片區域留空，可依需求放入 img */}
-							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[40px] border-2 border-white/20 overflow-hidden">
-								{/* <img src={eventData.custom.slideUrl} className="w-full h-full object-cover" /> */}
+							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center">
+								<QRCode value="https://sitcon.org/2026" size={160} bgColor="transparent" />
 							</div>
 						</div>
 
 						{/* 共筆項目 */}
 						<div className="flex flex-col gap-2">
-							<div className="flex items-center gap-2">
+							<div className="flex items-center gap-2 ml-[18px]">
 								<img src={hackIconImg} width={60} />
 								<img src={hackImg} width={90} />
 							</div>
-							{/* 圖片區域留空，可依需求放入 img */}
-							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[40px] border-2 border-white/20 overflow-hidden">
-								{/* <img src={eventData.custom.slideUrl} className="w-full h-full object-cover" /> */}
+
+							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center">
+								<QRCode value="https://sitcon.org/2026" size={160} bgColor="transparent" />
 							</div>
 						</div>
 					</div>
