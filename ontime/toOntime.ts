@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { writeFileSync, mkdirSync } from 'fs'
 import type { Agenda } from './agenda.ts'
 import type { OntimeEvent, OntimeOutput, OntimeRundown } from './ontime.ts'
 
@@ -259,6 +259,7 @@ const ontimeOutput: OntimeOutput = {
 	},
 }
 
-writeFileSync('sitcon2026.json', JSON.stringify(ontimeOutput, null, 2))
+mkdirSync('dist', { recursive: true })
+writeFileSync('dist/sitcon2026.json', JSON.stringify(ontimeOutput, null, 2))
 
 console.log('Generated script/ontime.json with rooms:', [...allRooms].join(', '))
