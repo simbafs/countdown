@@ -106,7 +106,9 @@ export default function Card() {
 									</h1>
 								</div>
 
-								<p className="text-[#E8E4DD] text-[36px] font-semibold">{eventData.custom.speaker}</p>
+								<p className="text-[#E8E4DD] text-[36px] font-semibold">
+									{eventData.custom.speaker || eventData.note}
+								</p>
 							</div>
 						</div>
 						<img src={noteImg} alt="Note" width={96} className="absolute right-[9px] bottom-[-124px]" />
