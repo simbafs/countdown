@@ -15,3 +15,8 @@ export interface TimerSettings {
 	selectedTimer: TimerName
 	[key: string]: unknown
 }
+
+export interface CardSettings {
+	bg: boolean
+	[key: string]: unknown
+}

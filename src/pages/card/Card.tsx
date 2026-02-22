@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
+import { CardSettingsPanel } from '../../components/CardSettingsPanel'
+import HoverMenu from '../../components/HoverMenu'
 import { useWebSocketContext } from '../../components/WebSocketProvider'
-import { DEFAULT_WEBSOCKET_PATH } from '../../constants'
+import { DEFAULT_CARD_SETTINGS, DEFAULT_WEBSOCKET_PATH } from '../../constants'
 import { useSetting } from '../../hooks/useSetting'
 import type { EventData } from '../../types'
 import { formatEventTime } from '../../utils/time'
@@ -16,8 +18,7 @@ import slideImg from './slide.png'
 import slidoIconImg from './slido-icon.png'
 
 export default function Card() {
-	// useClearSreachParams()
-	const { setting } = useSetting({ bg: false })
+	const { setting, setSetting } = useSetting(DEFAULT_CARD_SETTINGS)
 
 	const [eventData, setEventData] = useState<EventData | null>(null)
 
@@ -177,6 +178,10 @@ export default function Card() {
 					</div>
 				</div>
 			</div>
+
+			<HoverMenu position="top-right">
+				<CardSettingsPanel settings={setting} onSettingChange={setSetting} />
+			</HoverMenu>
 		</>
 	)
 }

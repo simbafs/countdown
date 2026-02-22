@@ -1,4 +1,4 @@
-import type { TimerName, TimerSettings } from '../types'
+import type { CardSettings, TimerName, TimerSettings } from '../types'
 
 export const DEFAULT_WEBSOCKET_PATH = 'ws://localhost:4001/ws'
 
@@ -15,4 +15,8 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
 	websocketPath: DEFAULT_WEBSOCKET_PATH,
 	textShadow: DEFAULT_TEXT_SHADOW,
 	selectedTimer: 'main' as TimerName,
+}
+
+export const DEFAULT_CARD_SETTINGS: CardSettings = {
+	bg: false,
 }
