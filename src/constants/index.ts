@@ -1,3 +1,3 @@
-export * from './timer'
 export * from './settings'
+export * from './timer'
 export * from './ui'

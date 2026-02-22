@@ -1,6 +1,6 @@
 import { TIMER_LABELS, TIMER_NAMES } from '../constants'
 import type { TextShadow, TimerName, TimerSettings } from '../types'
-import { Checkbox, TextInput, ColorPicker, RangeSlider, Select } from './ui'
+import { Checkbox, ColorPicker, RangeSlider, Select, TextInput } from './ui'
 
 interface SettingsPanelProps {
 	settings: TimerSettings
@@ -63,7 +63,11 @@ function TextShadowSettings({
 
 			{textShadow.enabled && (
 				<div className="space-y-3 ml-7">
-					<ColorPicker label="Shadow Color" value={textShadow.color} onChange={color => onChange({ color })} />
+					<ColorPicker
+						label="Shadow Color"
+						value={textShadow.color}
+						onChange={color => onChange({ color })}
+					/>
 
 					<RangeSlider
 						label="Offset X"

@@ -10,7 +10,13 @@ interface UseWebSocketEventsOptions {
 	onMessage?: (tag: string, payload: Record<string, unknown>) => void
 }
 
-export function useWebSocketEvents({ url, handler, ignoreOtherTags = true, ignoreUnhandledEvents = true, onMessage }: UseWebSocketEventsOptions) {
+export function useWebSocketEvents({
+	url,
+	handler,
+	ignoreOtherTags = true,
+	ignoreUnhandledEvents = true,
+	onMessage,
+}: UseWebSocketEventsOptions) {
 	const { registerHandler, unregisterHandler } = useWebSocketContext()
 
 	useEffect(() => {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { MAX_LOGS } from '../constants'
 import { useWebSocketContext } from '../components/WebSocketProvider'
+import { MAX_LOGS } from '../constants'
 import type { LogEntry } from '../types'
 
 interface LogTableProps {

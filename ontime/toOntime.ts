@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from 'fs'
+import { mkdirSync, writeFileSync } from 'fs'
 import type { Agenda } from './agenda.ts'
 import type { OntimeEvent, OntimeOutput, OntimeRundown } from './ontime.ts'
 
@@ -171,9 +171,7 @@ function mergeConsecutiveEvents(events: EventData[]): EventData[] {
 }
 
 for (const room of allRooms) {
-	const roomEvents = events
-		.filter(e => e.room.includes(room))
-		.sort((a, b) => a.timeStart - b.timeStart)
+	const roomEvents = events.filter(e => e.room.includes(room)).sort((a, b) => a.timeStart - b.timeStart)
 
 	const mergedEvents = mergeConsecutiveEvents(roomEvents)
 

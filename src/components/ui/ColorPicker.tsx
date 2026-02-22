@@ -54,7 +54,9 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
 									key={color}
 									onClick={() => handleColorSelect(color)}
 									className={`w-8 h-8 rounded border-2 transition-all ${
-										value === color ? 'border-blue-500 scale-110' : 'border-gray-200 hover:border-gray-400'
+										value === color
+											? 'border-blue-500 scale-110'
+											: 'border-gray-200 hover:border-gray-400'
 									}`}
 									style={{ backgroundColor: color }}
 									type="button"
