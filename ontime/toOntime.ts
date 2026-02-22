@@ -132,14 +132,39 @@ for (const event of events) {
 
 const roomRundowns: Record<string, OntimeRundown> = {}
 
+function mergeConsecutiveEvents(events: EventData[]): EventData[] {
+	if (events.length === 0) return []
+
+	const merged: EventData[] = []
+	let current = { ...events[0] }
+
+	for (let i = 1; i < events.length; i++) {
+		const next = events[i]
+
+		if (next.title === current.title) {
+			current.timeEnd = next.timeEnd
+		} else {
+			merged.push(current)
+			current = { ...next }
+		}
+	}
+
+	merged.push(current)
+	return merged
+}
+
 for (const room of allRooms) {
-	const roomEvents = events.filter(e => e.room.includes(room)).sort((a, b) => a.timeStart - b.timeStart)
+	const roomEvents = events
+		.filter(e => e.room.includes(room))
+		.sort((a, b) => a.timeStart - b.timeStart)
+
+	const mergedEvents = mergeConsecutiveEvents(roomEvents)
 
 	const entries: Record<string, OntimeEvent> = {}
 	const order: string[] = []
 	const flatOrder: string[] = []
 
-	for (const event of roomEvents) {
+	for (const event of mergedEvents) {
 		const ontimeEvent = convertToOntimeEvent(event)
 		entries[event.id] = ontimeEvent
 		order.push(event.id)

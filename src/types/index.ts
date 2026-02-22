@@ -49,7 +49,12 @@ export interface EventData {
 	timeWarning: number
 	timeDanger: number
 	custom: {
-		speaker: string
+		speaker?: string
+		type?: string
+		slideURL?: string
+		hackmdURL?: string
+		slidoID?: string
+		[key: string]: unknown
 	}
 	triggers: unknown[]
 }

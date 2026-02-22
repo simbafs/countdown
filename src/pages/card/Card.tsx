@@ -94,7 +94,7 @@ export default function Card() {
 								<div>
 									<div className="flex justify-between items-center mb-2">
 										<span className="text-[#5C3D0E] text-xl font-extrabold text-[24px]">
-											Presentation
+											{eventData.custom.type}
 										</span>
 										<span className="text-[#5C3D0E] text-xl font-extrabold text-[24px]">
 											{formatEventTime(eventData.timeStart)} -{' '}
@@ -107,9 +107,7 @@ export default function Card() {
 									</h1>
 								</div>
 
-								<p className="text-[#E8E4DD] text-[36px] font-semibold">
-									{eventData.custom.speaker || eventData.note}
-								</p>
+								<p className="text-[#E8E4DD] text-[36px] font-semibold">{eventData.custom.speaker}</p>
 							</div>
 						</div>
 						<img src={noteImg} alt="Note" width={96} className="absolute right-[9px] bottom-[-124px]" />
@@ -123,7 +121,7 @@ export default function Card() {
 
 						<div className="text-white text-[36px] font-bold tracking-wide ">
 							{/* 若 eventData 有 slido 相關欄位請在此替換 */}
-							#SITCON26-R0-1
+							{eventData.custom.slidoID}
 						</div>
 					</div>
 
@@ -137,7 +135,9 @@ export default function Card() {
 							</div>
 							{/* 圖片區域留空，可依需求放入 img */}
 							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center">
-								<QRCode value="https://sitcon.org/2026" size={160} bgColor="transparent" />
+								{eventData.custom.slideURL && (
+									<QRCode value={eventData.custom.slideURL} size={160} bgColor="transparent" />
+								)}
 							</div>
 						</div>
 
@@ -149,7 +149,9 @@ export default function Card() {
 							</div>
 
 							<div className="aspect-square bg-[#E4C496] backdrop-blur-md rounded-[36px] border-2 border-white/20 overflow-hidden grid place-items-center">
-								<QRCode value="https://sitcon.org/2026" size={160} bgColor="transparent" />
+								{eventData.custom.hackmdURL && (
+									<QRCode value={eventData.custom.hackmdURL} size={160} bgColor="transparent" />
+								)}
 							</div>
 						</div>
 					</div>
