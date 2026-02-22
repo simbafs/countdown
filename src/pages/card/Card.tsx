@@ -116,14 +116,15 @@ export default function Card() {
 					<span className="grow" />
 
 					{/* Slido 區塊 */}
-					<div className="w-full flex flex-col items-start mb-[42px]">
-						<img src={slidoIconImg} width={152} />
+					{eventData.custom.slidoID && (
+						<div className="w-full flex flex-col items-start mb-[42px]">
+							<img src={slidoIconImg} width={152} />
 
-						<div className="text-white text-[36px] font-bold tracking-wide ">
-							{/* 若 eventData 有 slido 相關欄位請在此替換 */}
-							{eventData.custom.slidoID}
+							<div className="text-white text-[36px] font-bold tracking-wide ">
+								#{eventData.custom.slidoID}
+							</div>
 						</div>
-					</div>
+					)}
 
 					{/* 底部功能區塊 */}
 					<div className="w-full grid grid-cols-2 gap-[18px]">

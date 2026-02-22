@@ -141,3 +141,8 @@ pnpm run preview
 - **Support**: Negative time formatting
 - **Dynamic Sizing**: Automatically adjusts to container size
 - **Custom Styling**: Text shadows and colors configurable
+
+# TODO
+
+- 子母畫面的框切換
+- 缺 slide 或是 hackmd 的時候要放什麼
