@@ -90,7 +90,7 @@ export default function Card() {
 							/>
 
 							{/* 資訊內容層 */}
-							<div className="relative z-10 px-8 py-6 h-full flex flex-col justify-between text-left w-full">
+							<div className="relative px-8 py-6 h-full flex flex-col justify-between text-left w-full">
 								<div>
 									<div className="flex justify-between items-center mb-2">
 										<span className="text-[#5C3D0E] text-xl font-extrabold text-[24px]">
