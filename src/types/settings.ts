@@ -18,5 +18,6 @@ export interface TimerSettings {
 
 export interface CardSettings {
 	bg: boolean
+	websocketPath: string
 	[key: string]: unknown
 }

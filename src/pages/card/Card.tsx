@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { CardSettingsPanel } from '../../components/CardSettingsPanel'
 import HoverMenu from '../../components/HoverMenu'
 import { useWebSocketContext } from '../../components/WebSocketProvider'
-import { DEFAULT_CARD_SETTINGS, DEFAULT_WEBSOCKET_PATH } from '../../constants'
+import { DEFAULT_CARD_SETTINGS } from '../../constants'
 import { useSetting } from '../../hooks/useSetting'
 import type { EventData } from '../../types'
 import { formatEventTime } from '../../utils/time'
@@ -33,7 +33,7 @@ export default function Card() {
 	const { registerHandler, unregisterHandler } = useWebSocketContext()
 
 	useEffect(() => {
-		registerHandler(DEFAULT_WEBSOCKET_PATH, handler, {
+		registerHandler(setting.websocketPath, handler, {
 			ignoreOtherTags: true,
 			ignoreUnhandledEvents: true,
 		})
@@ -41,7 +41,7 @@ export default function Card() {
 		return () => {
 			unregisterHandler()
 		}
-	}, [handler, registerHandler, unregisterHandler])
+	}, [setting.websocketPath, handler, registerHandler, unregisterHandler])
 
 	if (!eventData) {
 		return (

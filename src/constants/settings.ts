@@ -19,4 +19,5 @@ export const DEFAULT_TIMER_SETTINGS: TimerSettings = {
 
 export const DEFAULT_CARD_SETTINGS: CardSettings = {
 	bg: false,
+	websocketPath: DEFAULT_WEBSOCKET_PATH,
 }
