@@ -62,10 +62,27 @@ function getColourForType(type: string): string {
 	return typeColours[type] || ''
 }
 
-function convertSessionToEventData(session: Agenda['sessions'][number]): EventData {
+async function getSlidoID(qaUrl: string | null): Promise<string | undefined> {
+	if (!qaUrl) return undefined
+
+	const match = qaUrl.match(/event\/([a-f0-9-]+)/i)
+	if (!match) return undefined
+
+	const uuid = match[1]
+
+	try {
+		const res = await fetch(`https://app.sli.do/eu1/api/v0.5/events/${uuid}`)
+		const data = (await res.json()) as { code: string }
+		return data.code
+	} catch {
+		return undefined
+	}
+}
+async function convertSessionToEventData(session: Agenda['sessions'][number]): Promise<EventData> {
 	const typeName = convertSessionType(session.type, agenda.session_types)
 	const speakers = convertSpeakers(session.speakers, agenda.speakers)
 	const rooms = convertRooms(session.room, session.broadcast)
+	const slidoID = await getSlidoID(session.qa)
 
 	return {
 		id: session.id,
@@ -74,7 +91,7 @@ function convertSessionToEventData(session: Agenda['sessions'][number]): EventDa
 		title: session.zh.title,
 		slideURL: session.slide ?? undefined,
 		hackmdURL: session.co_write ?? undefined,
-		slidoID: '#SITCON26-R0-1', // TODO: a mock Slido ID
+		slidoID,
 		room: rooms,
 		timeStart: parseISOTime(session.start),
 		timeEnd: parseISOTime(session.end),
@@ -121,7 +138,7 @@ function convertToOntimeEvent(event: EventData): OntimeEvent {
 	}
 }
 
-const events: EventData[] = agenda.sessions.map(convertSessionToEventData)
+const events: EventData[] = await Promise.all(agenda.sessions.map(convertSessionToEventData))
 
 const allRooms = new Set<string>()
 for (const event of events) {
