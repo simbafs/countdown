@@ -77,9 +77,9 @@ export default function Card() {
 					)}
 				>
 					{/* 頂部活動資訊卡 (Rectangle 39348) */}
-					<div className="relative">
+					<div className="relative w-full min-h-[260px]">
 						<div
-							className="relative bg-[#FFAF38] rounded-[36px] overflow-hidden"
+							className="bg-[#FFAF38] rounded-[36px] overflow-hidden h-full"
 							// style={{ boxShadow: '0px 0px 10px rgba(108, 65, 3, 0.6)' }}
 						>
 							{/* 金屬覆蓋層 (Rectangle 39342) */}
@@ -102,15 +102,11 @@ export default function Card() {
 									</div>
 
 									<h1 className="text-[#3C3A38] text-[48px] font-bold leading-tight break-all">
-										{/* {eventData.title} */}
-										簡報新手村 - 如何出村不爆死
+										{eventData.title}
 									</h1>
 								</div>
 
-								<p className="text-[#E8E4DD] text-[36px] font-semibold">
-									{/* {eventData.custom.speaker || '講者'} */}
-									簡報菜鳥
-								</p>
+								<p className="text-[#E8E4DD] text-[36px] font-semibold">{eventData.custom.speaker}</p>
 							</div>
 						</div>
 						<img src={noteImg} alt="Note" width={96} className="absolute right-[9px] bottom-[-124px]" />
