@@ -1,20 +1,6 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
-import Card from '../pages/card/Card'
-import Timer from '../pages/Timer'
-import WebSocketDebugPage from '../pages/WebSocketDebugPage'
+import { pages } from '../config/pages'
 import HoverMenu from './HoverMenu'
-
-interface Page {
-	name: string
-	path: string
-	element: React.ReactNode
-}
-
-const pages: Page[] = [
-	{ name: 'Timer', path: '/', element: <Timer /> },
-	{ name: 'Card', path: '/card', element: <Card /> },
-	{ name: 'WebSocket Debug', path: '/debug', element: <WebSocketDebugPage /> },
-]
 
 export default function Layout() {
 	const location = useLocation()
