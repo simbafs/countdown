@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
-		"postbuild": "node --import=tsx --experimental-strip-types ontime/toOntime.ts",
+		"postbuild": "tsx ontime/toOntime.ts",
 		"preview": "vite preview",
 		"format": "prettier --write ."
 	},
