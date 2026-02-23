@@ -41,6 +41,7 @@ export default function WebSocketDebugPage() {
 	const [isConnected, setIsConnected] = useState(false)
 	const [activeView, setActiveView] = useState<'events' | 'tags'>('events')
 	const [autoScroll, setAutoScroll] = useState(true)
+	const [filter, setFilter] = useState('')
 	const logContainerRef = useRef<HTMLDivElement>(null)
 
 	const addLog = useCallback((type: LogEntry['type'], name: string, data: unknown) => {
@@ -94,6 +95,13 @@ export default function WebSocketDebugPage() {
 
 	const eventLogs = logs.filter(log => log.type === 'event')
 	const tagLogs = logs.filter(log => log.type === 'tag')
+
+	const filteredEventLogs = eventLogs.filter(
+		log => filter === '' || log.name.toLowerCase().includes(filter.toLowerCase()),
+	)
+	const filteredTagLogs = tagLogs.filter(
+		log => filter === '' || log.name.toLowerCase().includes(filter.toLowerCase()),
+	)
 
 	const clearLogs = () => setLogs([])
 
@@ -159,6 +167,14 @@ export default function WebSocketDebugPage() {
 							Tags ({tagLogs.length})
 						</button>
 					</div>
+
+					<input
+						type="text"
+						value={filter}
+						onChange={e => setFilter(e.target.value)}
+						placeholder="Filter by name..."
+						className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
+					/>
 				</div>
 
 				{/* Log Controls */}
@@ -198,19 +214,23 @@ export default function WebSocketDebugPage() {
 			{/* Logs Display */}
 			<div ref={logContainerRef} className="bg-gray-900 rounded-lg p-4 h-128 overflow-auto">
 				{activeView === 'events' ? (
-					eventLogs.length === 0 ? (
+					filteredEventLogs.length === 0 ? (
 						<div className="text-gray-400 text-center py-8">
-							No events yet. Connect to a WebSocket source to see runtime-data events.
+							{eventLogs.length === 0
+								? 'No events yet. Connect to a WebSocket source to see runtime-data events.'
+								: 'No matching events.'}
 						</div>
 					) : (
-						<LogTable logs={eventLogs} columnHeader="Event" />
+						<LogTable logs={filteredEventLogs} columnHeader="Event" />
 					)
-				) : tagLogs.length === 0 ? (
+				) : filteredTagLogs.length === 0 ? (
 					<div className="text-gray-400 text-center py-8">
-						No tags yet. Connect to a WebSocket source to see top-level message tags.
+						{tagLogs.length === 0
+							? 'No tags yet. Connect to a WebSocket source to see top-level message tags.'
+							: 'No matching tags.'}
 					</div>
 				) : (
-					<LogTable logs={tagLogs} columnHeader="Tag" />
+					<LogTable logs={filteredTagLogs} columnHeader="Tag" />
 				)}
 			</div>
 		</div>
