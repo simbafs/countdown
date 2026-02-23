@@ -20,6 +20,10 @@ export function CardSettingsPanel({ settings, onSettingChange }: CardSettingsPan
 				placeholder="ws://localhost:4001/ws"
 			/>
 
+			<a href="/sitcon2026.json" className="text-blue-600 text-sm hover:underline mt-2 block">
+				Ontime Config
+			</a>
+
 			<div className="text-gray-400 text-xs italic mt-2">Move cursor away to close</div>
 		</div>
 	)
