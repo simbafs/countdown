@@ -30,7 +30,6 @@
 		"react-router-dom": "^7.13.0",
 		"react-use-websocket": "^4.13.0",
 		"tailwind-merge": "^3.5.0",
-		"tailwindcss": "^4.1.18",
-		"vite-plugin-singlefile": "^2.3.0"
+		"tailwindcss": "^4.1.18"
 	}
 }

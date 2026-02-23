@@ -153,4 +153,3 @@ src/
 - Settings are persisted in URL query parameters
 - No external API dependencies besides the WebSocket connection
 - Transparent background for overlay/overlay-style display usage
-- Uses vite-plugin-singlefile to create a single HTML output file
